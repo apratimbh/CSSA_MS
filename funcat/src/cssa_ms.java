@@ -81,7 +81,7 @@ public class cssa_ms {
 			// ------ CSSA
 
 			int k=0;
-			while(k<10)
+			while(k<5)
 			{
 				// ----- select supernode with max snv
 
@@ -98,7 +98,7 @@ public class cssa_ms {
 				}
 				if(selected.contains(selected_sn.parent)||selected_sn.parent=="NIL") // If it is the child of some previously selected node
 				{
-					//selected_sn.print();
+					selected_sn.print();
 					for(String tmp : selected_sn.nodes) 
 					{
 						considered_nodes.add(tmp);
@@ -118,6 +118,8 @@ public class cssa_ms {
 						Split best_split=null;
 						if(reasoner.isEntailed(axiom)) // if it is a child of a previously selected ms node 
 						{
+							System.out.println("Child of ms");
+							selected_sn.print();
 							supernode_child_of_ms_flag=true;
 							supernode_found_sibling_flag=false;
 							double curr_best_sibling_snv=0;
@@ -133,7 +135,7 @@ public class cssa_ms {
 									{
 
 										// --- Sibling found
-
+										System.out.println("Sibling found");
 										supernode_found_sibling_flag=true;
 										Split temp=new Split(selected_sn,pot_sib);
 										if(temp.snv>curr_best_sibling_snv)
@@ -173,7 +175,9 @@ public class cssa_ms {
 					// --- afterwards
 					if(!supernode_child_of_ms_flag&&!(selected_sn.parent=="NIL"))
 					{
+						System.out.println("1");
 						Split temp=new Split(selected_sn,null);
+						System.out.println("Split value- "+temp.snv);
 						//System.out.println("Here: ");
 						//selected_sn.print();
 						if(current_best==null)
@@ -188,14 +192,17 @@ public class cssa_ms {
 								supernode_considered=true;
 							}
 						}
+						sn_list=cleanup(vertex,considered_nodes,weights);
 					}
 					else if(!supernode_child_of_ms_flag&&(selected_sn.parent=="NIL")) 
 					{
+						System.out.println("2");
 						for(String tmp : selected_sn.nodes)
 						{
 							selected.add(tmp);
 							//System.out.println("Selected- "+tmp);
 						}
+						System.out.println("Selected-ms: "+selected_sn.ms);
 						ms.add(selected_sn.ms);
 						k++;
 						considered_nodes.clear();
@@ -203,6 +210,7 @@ public class cssa_ms {
 					}
 					else 
 					{
+						System.out.println("3");
 						sn_list=cleanup(vertex,considered_nodes,weights);
 					}
 					if(sn_list==null)
@@ -230,10 +238,10 @@ public class cssa_ms {
 				}
 
 				//  -------
-			}
+			} // ---- while loop (one example)
 
 			// --------------
-		} // --for loop end
+		} // --for loop end // all examples
 	}
 
 	public ArrayList<Supernode> cleanup(ArrayList<String> vertex,ArrayList<String> considered,double[] weights)
