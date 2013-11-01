@@ -25,7 +25,7 @@ public class create_tree {
 		OWLDataFactory factory = manager.getOWLDataFactory();
 		OWLClass g1,g2;
 		try {
-			br = new BufferedReader(new FileReader("/host/dataset/cellcycle_FUN.train.arff"));
+			br = new BufferedReader(new FileReader("E:/dataset/cellcycle_FUN.train.arff"));
 			String line;
 			while((line = br.readLine())!=null)
 			{

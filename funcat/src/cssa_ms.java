@@ -58,10 +58,10 @@ public class cssa_ms {
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
 
-		for(int test_ex_no=15;test_ex_no<result[0].length;test_ex_no++)
+		for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 		{
 			// --- create lists
-			System.out.println("\n\nNew example - - - - - - - - - -");
+			System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
 			double[] weights=new double[result.length];
 			for(int i=0;i<result.length;i++)
 			{
@@ -85,7 +85,7 @@ public class cssa_ms {
 			{
 				// ----- select supernode with max snv
 
-				Supernode selected_sn=null;
+				Supernode selected_sn=sn_list.get(0);
 				int selected_sn_idx=0;
 				double max_snv=sn_list.get(0).snv;
 				for(Supernode tmp : sn_list)
@@ -98,7 +98,6 @@ public class cssa_ms {
 				}
 				if(selected.contains(selected_sn.parent)||selected_sn.parent=="NIL") // If it is the child of some previously selected node
 				{
-					selected_sn.print();
 					for(String tmp : selected_sn.nodes) 
 					{
 						considered_nodes.add(tmp);
@@ -118,8 +117,8 @@ public class cssa_ms {
 						Split best_split=null;
 						if(reasoner.isEntailed(axiom)) // if it is a child of a previously selected ms node 
 						{
-							System.out.println("Child of ms");
-							selected_sn.print();
+							//System.out.println("Child of ms");
+							//selected_sn.print();
 							supernode_child_of_ms_flag=true;
 							supernode_found_sibling_flag=false;
 							double curr_best_sibling_snv=0;
@@ -135,7 +134,7 @@ public class cssa_ms {
 									{
 
 										// --- Sibling found
-										System.out.println("Sibling found");
+										//System.out.println("Sibling found");
 										supernode_found_sibling_flag=true;
 										Split temp=new Split(selected_sn,pot_sib);
 										if(temp.snv>curr_best_sibling_snv)
@@ -173,11 +172,11 @@ public class cssa_ms {
 					}    // -- end of main loop
 
 					// --- afterwards
-					if(!supernode_child_of_ms_flag&&!(selected_sn.parent=="NIL"))
+					if(!supernode_child_of_ms_flag||(selected_sn.parent=="NIL"))
 					{
-						System.out.println("1");
+						//System.out.println("1");
 						Split temp=new Split(selected_sn,null);
-						System.out.println("Split value- "+temp.snv);
+						//System.out.println("Split value- "+temp.snv);
 						//System.out.println("Here: ");
 						//selected_sn.print();
 						if(current_best==null)
@@ -194,10 +193,10 @@ public class cssa_ms {
 						}
 						sn_list=cleanup(vertex,considered_nodes,weights);
 					}
-					else if(!supernode_child_of_ms_flag&&(selected_sn.parent=="NIL")) 
+					/*else if(!supernode_child_of_ms_flag&&(selected_sn.parent=="NIL")) 
 					{
 						System.out.println("2");
-						for(String tmp : selected_sn.nodes)
+						/*for(String tmp : selected_sn.nodes)
 						{
 							selected.add(tmp);
 							//System.out.println("Selected- "+tmp);
@@ -207,27 +206,40 @@ public class cssa_ms {
 						k++;
 						considered_nodes.clear();
 						sn_list=cleanup(vertex,selected,weights);
-					}
+					}*/
 					else 
 					{
-						System.out.println("3");
+						//System.out.println("3");
 						sn_list=cleanup(vertex,considered_nodes,weights);
 					}
 					if(sn_list==null)
 					{
-						System.out.println("Entered");
+						//System.out.println("Entered");
 						for(String tmp : current_best.nodes)
 						{
 							selected.add(tmp);
+							//System.out.println("Selected- "+tmp);
 						}
 						for(String tmp : current_best.ms)
 						{
 							ms.add(tmp);
 							System.out.println("Selected- "+tmp);
+							//selected.add(tmp);
 						}
 						k++;
+						current_best=null;
 						considered_nodes.clear();
+						for(String s : selected)
+						{
+							considered_nodes.add(s);
+						}
 						sn_list=cleanup(vertex,selected,weights);
+						/*System.out.println("");
+						for(String s : selected)
+						{
+							System.out.print(s+", ");
+						}
+						System.out.println("");*/
 					}
 				} // -- end
 				else
