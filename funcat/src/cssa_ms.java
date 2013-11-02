@@ -26,7 +26,8 @@ import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 
 
 public class cssa_ms {
-	public double[][] result=null;
+	public double[][] result=null,flabels=null;
+	public double[][] pr_val=new double[10][3];
 	OWLOntologyManager manager;
 	OWLOntology go;
 	OWLReasoner reasoner;
@@ -47,8 +48,8 @@ public class cssa_ms {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		result=read_file("fun_cellcycle_result.txt");
-
+		result=read_file("D:/matp/funcat_cellcyle_1.txt");
+		flabels=read_file("test.arff");
 		manager = OWLManager.createOWLOntologyManager();
 		go = manager.loadOntologyFromOntologyDocument(new File("E:/ontologies/cellcycle_FUN.owl"));
 		System.out.println("Loaded ontology: " + go.getOntologyID().toString());
@@ -255,7 +256,11 @@ public class cssa_ms {
 			// --------------
 		} // --for loop end // all examples
 	}
-
+	public pr calculate_pr(ArrayList<String> selected,double[] weights,ArrayList<String> vertex,int k,double[] results)
+	{
+		pr tmp=new pr(0,0);
+		return tmp;
+	}
 	public ArrayList<Supernode> cleanup(ArrayList<String> vertex,ArrayList<String> considered,double[] weights)
 	{
 		ArrayList<String> new_list=new ArrayList<String>();
@@ -437,5 +442,12 @@ class Split {
 		}
 		else
 			snv=(node1.snv*node1.size)/(node1.size);
+	}
+}
+class pr {
+	double p=0,r=0;
+	public pr(double p,double r) {
+		this.p=p;
+		this.r=r;  
 	}
 }
