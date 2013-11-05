@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="E:/Eclipse/eclipse/libs/jcel-0.18.2.jar"/>
 	<classpathentry kind="lib" path="E:/Eclipse/eclipse/libs/lpsolve55j.jar"/>
 	<classpathentry kind="lib" path="E:/Eclipse/eclipse/libs/owlapi-distribution-3.4.4-SNAPSHOT-bin.jar"/>
+	<classpathentry kind="lib" path="D:/Program Files/Weka-3-6/weka.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
