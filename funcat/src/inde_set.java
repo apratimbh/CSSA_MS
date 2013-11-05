@@ -37,7 +37,7 @@ public class inde_set {
 
 	public static void main(String[] args) throws OWLOntologyCreationException
 	{
-		cssa_ms o=new cssa_ms();
+		inde_set o=new inde_set();
 		o.main();
 	}
 
@@ -50,7 +50,6 @@ public class inde_set {
 			e.printStackTrace();
 		}
 		result=read_file("D:/matp/funcat_cellcyle_1.txt");
-		flabels=read_file("test.arff");
 		manager = OWLManager.createOWLOntologyManager();
 		go = manager.loadOntologyFromOntologyDocument(new File("E:/ontologies/cellcycle_FUN.owl"));
 		System.out.println("Loaded ontology: " + go.getOntologyID().toString());
@@ -69,7 +68,23 @@ public class inde_set {
 			{
 				weights[i]=result[i][test_ex_no];
 			}
-			ArrayList<String> nvertex=get_vertex(vertex,weights,0.9);
+			double max=weights[0],min=weights[0];
+			for(int i=0;i<weights.length;i++)
+			{
+				if(weights[i]>max)
+				{
+					max=weights[i];
+				}
+				if(weights[i]<min)
+				{
+					min=weights[i];
+				}
+			}
+			for(int i=0;i<weights.length;i++)
+			{
+				weights[i]=(weights[i]-min)/(max-min);
+			}
+			ArrayList<String> nvertex=get_vertex(vertex,weights,0.5);
 			ArrayList<vertex> vertex_list=new ArrayList<vertex>();
 			ArrayList<edge> edge_list=new ArrayList<edge>();
 			for(String v : nvertex)

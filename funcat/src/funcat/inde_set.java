@@ -68,6 +68,7 @@ public class inde_set {
 		for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 		{
 			// --- create lists
+			dfsv.clear();
 			System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
 			int vertex_num=2;
 			double[] weights=new double[result.length];
@@ -211,25 +212,63 @@ public class inde_set {
 			System.exit(0);*/
 			FlowNetwork G = new FlowNetwork(vertex_list, edge_list);
 			FordFulkerson maxflow = new FordFulkerson(G, 0, 1);
-			StdOut.println("Max flow from " + 0 + " to " + 1);
+			double[][] dfsg=new double[vertex_list.size()][vertex_list.size()]; 
+			int m[]= new int[vertex_list.size()];
+			for (int i=0; i<vertex_list.size(); i++)  
+			{  
+				m[i] = 0;  
+			}
+			//StdOut.println("Max flow from " + 0 + " to " + 1);
 			for (int v = 0; v < G.V(); v++) {
 				for (FlowEdge e : G.adj(v)) {
 					if ((v == e.from()) && e.flow() > 0)
-						StdOut.println("   " + e);
+						//StdOut.println("   " + e);
+						dfsg[e.from()][e.to()]=e.capacity();
 				}
 			}
-
-			// print min-cut
-			StdOut.print("Min cut: ");
+			dfs(dfsg,m,0,vertex_list.size());
+			ArrayList<Integer> max_cut=new ArrayList<Integer>();
+			for(int i : dfsv)
+			{
+				if(i>1&&!dfsv.contains(i+1))
+				{
+					max_cut.add(i);
+				}
+			}
+			for(vertex v : vertex_list)
+			{
+				if(max_cut.contains(v.num))
+				{
+					System.out.println(v.name);
+				}
+			}
+			/*System.out.println("Visited vertices: -\n");
+			for(int i: max_cut)
+			{
+				System.out.print(i+" / ");
+			}
+			System.out.println();
+			// print min-cut*/
+			/*StdOut.print("Min cut: ");
 			for (int v = 0; v < G.V(); v++) {
 				if (maxflow.inCut(v)) StdOut.print(v + " ");
 			}
 			StdOut.println();
 
-			StdOut.println("Max flow value = " +  maxflow.value());
+			StdOut.println("Max flow value = " +  maxflow.value());*/
 			// --------------
 
 		} // --for loop end // all examples
+	}
+	ArrayList<Integer> dfsv=new ArrayList<Integer>();
+	public void dfs(double a[][], int m[], int i, int n)  
+	{  
+		int j;  
+		dfsv.add(i); 
+		m[i] = 1;  
+		for(j=0; j<n; j++)  
+			if(a[i][j]>0 && m[j]==0)  
+				dfs(a,m,j,n);  
 	}
 	public ArrayList<String> get_vertex(ArrayList<String> vertex,double[] weights,double w)
 	{
