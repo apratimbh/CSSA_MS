@@ -91,7 +91,7 @@ public class weka_test {
 				}
 				i++;
 			}
-
+			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

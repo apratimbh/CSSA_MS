@@ -237,7 +237,7 @@ public class inde_set {
 				}
 				i++;
 			}
-
+			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

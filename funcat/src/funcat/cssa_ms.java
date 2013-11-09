@@ -1,3 +1,4 @@
+package funcat;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,7 +50,7 @@ public class cssa_ms {
 			e.printStackTrace();
 		}
 		result=read_file("D:/matp/funcat_cellcyle_1.txt");
-		flabels=read_file("test.arff");
+		//flabels=read_file("test.arff");
 		manager = OWLManager.createOWLOntologyManager();
 		go = manager.loadOntologyFromOntologyDocument(new File("E:/ontologies/cellcycle_FUN.owl"));
 		System.out.println("Loaded ontology: " + go.getOntologyID().toString());
@@ -58,143 +59,146 @@ public class cssa_ms {
 		OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
-
-		for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
+		double[][] test_data=load_test_data("E:/dataset/cellcycle_FUN_test_expanded.arff",77);
+		int k=1;
+		while(k<vertex.size())
 		{
-			// --- create lists
-			System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
-			double[] weights=new double[result.length];
-			for(int i=0;i<result.length;i++)
+			for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 			{
-				weights[i]=result[i][test_ex_no];
-			}
-
-			ArrayList<Supernode> sn_list=create_supernodes(vertex,weights,vertex); 
-			ArrayList<Supernode> questionable=new ArrayList<Supernode>();
-			ArrayList<String> ms=new ArrayList<String>();
-			ArrayList<String> selected=new ArrayList<String>();
-
-			ArrayList<String> considered_nodes=new ArrayList<String>();
-			Split current_best=null;
-
-			// -------------
-
-			// ------ CSSA
-
-			int k=0;
-			while(k<5)
-			{
-				// ----- select supernode with max snv
-
-				Supernode selected_sn=sn_list.get(0);
-				int selected_sn_idx=0;
-				double max_snv=sn_list.get(0).snv;
-				for(Supernode tmp : sn_list)
+				// --- create lists
+				System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
+				double[] weights=new double[result.length];
+				for(int i=0;i<result.length;i++)
 				{
-					if(tmp.snv>max_snv)
-					{
-						selected_sn=tmp;
-						selected_sn_idx=sn_list.indexOf(tmp);
-					}
+					weights[i]=result[i][test_ex_no];
 				}
-				if(selected.contains(selected_sn.parent)||selected_sn.parent=="NIL") // If it is the child of some previously selected node
+
+				ArrayList<Supernode> sn_list=create_supernodes(vertex,weights,vertex); 
+				ArrayList<Supernode> questionable=new ArrayList<Supernode>();
+				ArrayList<String> ms=new ArrayList<String>();
+				ArrayList<String> selected=new ArrayList<String>();
+
+				ArrayList<String> considered_nodes=new ArrayList<String>();
+				Split current_best=null;
+
+				// -------------
+
+				// ------ CSSA
+
+				int k1=0;
+				while(k1<k)
 				{
-					for(String tmp : selected_sn.nodes) 
+					// ----- select supernode with max snv
+
+					Supernode selected_sn=sn_list.get(0);
+					int selected_sn_idx=0;
+					double max_snv=sn_list.get(0).snv;
+					for(Supernode tmp : sn_list)
 					{
-						considered_nodes.add(tmp);
-					}
-					boolean supernode_child_of_ms_flag=false;
-					boolean supernode_found_sibling_flag=false;
-					boolean supernode_considered=false;
-					// --- check if child of previously selected ms node
-
-					main_loop: for(String ms_node : ms)
-					{
-						OWLClass c1=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+ms_node));
-						OWLClass c2=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+selected_sn.ms));
-						OWLAxiom axiom=factory.getOWLSubClassOfAxiom(c2, c1);
-
-
-						Split best_split=null;
-						if(reasoner.isEntailed(axiom)) // if it is a child of a previously selected ms node 
+						if(tmp.snv>max_snv)
 						{
-							//System.out.println("Child of ms");
-							//selected_sn.print();
-							supernode_child_of_ms_flag=true;
-							supernode_found_sibling_flag=false;
-							double curr_best_sibling_snv=0;
-							for(Supernode pot_sib : questionable) // search for siblings
-							{
-								OWLClass c3=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+pot_sib.ms));
-								OWLAxiom axiom1=factory.getOWLSubClassOfAxiom(c3,c1);
-								if(reasoner.isEntailed(axiom1))
-								{
-									OWLAxiom axiom2=factory.getOWLSubClassOfAxiom(c2,c3);
-									OWLAxiom axiom3=factory.getOWLSubClassOfAxiom(c3,c2);
-									if(!reasoner.isEntailed(axiom2)&&!reasoner.isEntailed(axiom3))
-									{
+							selected_sn=tmp;
+							selected_sn_idx=sn_list.indexOf(tmp);
+						}
+					}
+					if(selected.contains(selected_sn.parent)||selected_sn.parent=="NIL") // If it is the child of some previously selected node
+					{
+						for(String tmp : selected_sn.nodes) 
+						{
+							considered_nodes.add(tmp);
+						}
+						boolean supernode_child_of_ms_flag=false;
+						boolean supernode_found_sibling_flag=false;
+						boolean supernode_considered=false;
+						// --- check if child of previously selected ms node
 
-										// --- Sibling found
-										//System.out.println("Sibling found");
-										supernode_found_sibling_flag=true;
-										Split temp=new Split(selected_sn,pot_sib);
-										if(temp.snv>curr_best_sibling_snv)
+						main_loop: for(String ms_node : ms)
+						{
+							OWLClass c1=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+ms_node));
+							OWLClass c2=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+selected_sn.ms));
+							OWLAxiom axiom=factory.getOWLSubClassOfAxiom(c2, c1);
+
+
+							Split best_split=null;
+							if(reasoner.isEntailed(axiom)) // if it is a child of a previously selected ms node 
+							{
+								//System.out.println("Child of ms");
+								//selected_sn.print();
+								supernode_child_of_ms_flag=true;
+								supernode_found_sibling_flag=false;
+								double curr_best_sibling_snv=0;
+								for(Supernode pot_sib : questionable) // search for siblings
+								{
+									OWLClass c3=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+pot_sib.ms));
+									OWLAxiom axiom1=factory.getOWLSubClassOfAxiom(c3,c1);
+									if(reasoner.isEntailed(axiom1))
+									{
+										OWLAxiom axiom2=factory.getOWLSubClassOfAxiom(c2,c3);
+										OWLAxiom axiom3=factory.getOWLSubClassOfAxiom(c3,c2);
+										if(!reasoner.isEntailed(axiom2)&&!reasoner.isEntailed(axiom3))
 										{
-											curr_best_sibling_snv=temp.snv;
-											best_split=temp;
+
+											// --- Sibling found
+											//System.out.println("Sibling found");
+											supernode_found_sibling_flag=true;
+											Split temp=new Split(selected_sn,pot_sib);
+											if(temp.snv>curr_best_sibling_snv)
+											{
+												curr_best_sibling_snv=temp.snv;
+												best_split=temp;
+											}
 										}
 									}
-								}
-							} // end of search
-							if(supernode_found_sibling_flag) // if a sibling has been found
-							{
-								Split temp=best_split;
-								if(current_best==null)
+								} // end of search
+								if(supernode_found_sibling_flag) // if a sibling has been found
 								{
-									current_best=temp;
-								}
-								else
-								{
-									if(temp==(compare_splits(selected,current_best,temp,weights,vertex)))
+									Split temp=best_split;
+									if(current_best==null)
 									{
 										current_best=temp;
-										supernode_considered=true;
-										sn_list.remove(selected_sn);
 									}
+									else
+									{
+										if(temp==(compare_splits(selected,current_best,temp,weights,vertex)))
+										{
+											current_best=temp;
+											supernode_considered=true;
+											sn_list.remove(selected_sn);
+										}
+									}
+
 								}
+								else 
+								{
+									questionable.add(selected_sn);
+								}
+								break main_loop;
+							} //  end of search for siblings if it is child of some prev. ms
+						}    // -- end of main loop
 
-							}
-							else 
-							{
-								questionable.add(selected_sn);
-							}
-							break main_loop;
-						} //  end of search for siblings if it is child of some prev. ms
-					}    // -- end of main loop
-
-					// --- afterwards
-					if(!supernode_child_of_ms_flag||(selected_sn.parent=="NIL"))
-					{
-						//System.out.println("1");
-						Split temp=new Split(selected_sn,null);
-						//System.out.println("Split value- "+temp.snv);
-						//System.out.println("Here: ");
-						//selected_sn.print();
-						if(current_best==null)
+						// --- afterwards
+						if(!supernode_child_of_ms_flag||(selected_sn.parent=="NIL"))
 						{
-							current_best=temp;
-						}
-						else
-						{
-							if(temp==(compare_splits(selected,current_best,temp,weights,vertex)))
+							//System.out.println("1");
+							Split temp=new Split(selected_sn,null);
+							//System.out.println("Split value- "+temp.snv);
+							//System.out.println("Here: ");
+							//selected_sn.print();
+							if(current_best==null)
 							{
 								current_best=temp;
-								supernode_considered=true;
 							}
+							else
+							{
+								if(temp==(compare_splits(selected,current_best,temp,weights,vertex)))
+								{
+									current_best=temp;
+									supernode_considered=true;
+								}
+							}
+							sn_list=cleanup(vertex,considered_nodes,weights);
 						}
-						sn_list=cleanup(vertex,considered_nodes,weights);
-					}
-					/*else if(!supernode_child_of_ms_flag&&(selected_sn.parent=="NIL")) 
+						/*else if(!supernode_child_of_ms_flag&&(selected_sn.parent=="NIL")) 
 					{
 						System.out.println("2");
 						/*for(String tmp : selected_sn.nodes)
@@ -208,53 +212,54 @@ public class cssa_ms {
 						considered_nodes.clear();
 						sn_list=cleanup(vertex,selected,weights);
 					}*/
-					else 
-					{
-						//System.out.println("3");
-						sn_list=cleanup(vertex,considered_nodes,weights);
-					}
-					if(sn_list==null)
-					{
-						//System.out.println("Entered");
-						for(String tmp : current_best.nodes)
+						else 
 						{
-							selected.add(tmp);
-							//System.out.println("Selected- "+tmp);
+							//System.out.println("3");
+							sn_list=cleanup(vertex,considered_nodes,weights);
 						}
-						for(String tmp : current_best.ms)
+						if(sn_list==null)
 						{
-							ms.add(tmp);
-							System.out.println("Selected- "+tmp);
-							//selected.add(tmp);
-						}
-						k++;
-						current_best=null;
-						considered_nodes.clear();
-						for(String s : selected)
-						{
-							considered_nodes.add(s);
-						}
-						sn_list=cleanup(vertex,selected,weights);
-						/*System.out.println("");
+							//System.out.println("Entered");
+							for(String tmp : current_best.nodes)
+							{
+								selected.add(tmp);
+								//System.out.println("Selected- "+tmp);
+							}
+							for(String tmp : current_best.ms)
+							{
+								ms.add(tmp);
+								System.out.println("Selected- "+tmp);
+								//selected.add(tmp);
+							}
+							k1++;
+							current_best=null;
+							considered_nodes.clear();
+							for(String s : selected)
+							{
+								considered_nodes.add(s);
+							}
+							sn_list=cleanup(vertex,selected,weights);
+							/*System.out.println("");
 						for(String s : selected)
 						{
 							System.out.print(s+", ");
 						}
 						System.out.println("");*/
+						}
+					} // -- end
+					else
+					{
+						String parent=sn_list.get(selected_sn_idx).parent;
+						selected_sn.add(parent, weights[vertex.indexOf(parent)]);
+						sn_list.set(selected_sn_idx,selected_sn);
 					}
-				} // -- end
-				else
-				{
-					String parent=sn_list.get(selected_sn_idx).parent;
-					selected_sn.add(parent, weights[vertex.indexOf(parent)]);
-					sn_list.set(selected_sn_idx,selected_sn);
-				}
 
-				//  -------
-			} // ---- while loop (one example)
+					//  -------
+				} // ---- while loop (one example)
 
-			// --------------
-		} // --for loop end // all examples
+				// --------------
+			} // --for loop end // all examples
+		}
 	}
 	public pr calculate_pr(ArrayList<String> selected,double[] weights,ArrayList<String> vertex,int k,double[] results)
 	{
@@ -322,7 +327,21 @@ public class cssa_ms {
 		}
 		return temp;
 	}
-
+	
+	public double[][] load_test_data(String file,int no_of_columns_to_exclude)
+	{
+		double[][] temp=read_file(file);
+		double[][] temp1=new double[temp.length][temp[0].length- no_of_columns_to_exclude];
+		for(int j= no_of_columns_to_exclude+1;j<temp[0].length;j++)
+		{
+			for(int i=0;i<temp.length;i++)
+			{
+				temp1[i][j]=temp[i][j];
+			}
+		}
+		return temp1;
+	}
+	
 	public double[][] read_file(String file)
 	{
 		double[][] temp=null;
@@ -362,7 +381,7 @@ public class cssa_ms {
 				}
 				i++;
 			}
-
+			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

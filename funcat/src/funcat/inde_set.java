@@ -212,32 +212,31 @@ public class inde_set {
 			System.exit(0);*/
 			FlowNetwork G = new FlowNetwork(vertex_list, edge_list);
 			FordFulkerson maxflow = new FordFulkerson(G, 0, 1);
-			double[][] dfsg=new double[vertex_list.size()][vertex_list.size()]; 
+			/*double[][] dfsg=new double[vertex_list.size()][vertex_list.size()]; 
 			int m[]= new int[vertex_list.size()];
 			for (int i=0; i<vertex_list.size(); i++)  
 			{  
 				m[i] = 0;  
-			}
+			}*/
 			//StdOut.println("Max flow from " + 0 + " to " + 1);
-			for (int v = 0; v < G.V(); v++) {
+		/*	for (int v = 0; v < G.V(); v++) {
 				for (FlowEdge e : G.adj(v)) {
 					if ((v == e.from()) && e.flow() > 0)
 						//StdOut.println("   " + e);
-						dfsg[e.from()][e.to()]=e.capacity();
+						//dfsg[e.from()][e.to()]=e.capacity();
 				}
 			}
-			dfs(dfsg,m,0,vertex_list.size());
-			ArrayList<Integer> max_cut=new ArrayList<Integer>();
-			for(int i : dfsv)
-			{
-				if(i>1&&!dfsv.contains(i+1))
+			dfs(dfsg,m,0,vertex_list.size());*/
+			ArrayList<Integer> min_cut=new ArrayList<Integer>();
+			for (int v = 1; v < G.V(); v++) {
+				if (maxflow.inCut(v)) 
 				{
-					max_cut.add(i);
+					min_cut.add(v);
 				}
 			}
 			for(vertex v : vertex_list)
 			{
-				if(max_cut.contains(v.num))
+				if(min_cut.contains(v.num))
 				{
 					System.out.println(v.name);
 				}
@@ -322,7 +321,7 @@ public class inde_set {
 				}
 				i++;
 			}
-
+			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
