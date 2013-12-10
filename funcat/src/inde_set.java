@@ -27,7 +27,7 @@ import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 
 
 public class inde_set {
-	public double[][] result=null,flabels=null;
+	public double[][] result=null,flabels=null,test_data=null;
 	public double[][] pr_val=new double[10][3];
 	OWLOntologyManager manager;
 	OWLOntology go;
@@ -58,132 +58,140 @@ public class inde_set {
 		OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
-
-		for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
+		test_data=load_test_data("E:/dataset/cellcycle_FUN_test_expanded.arff",77);
+		double limit=0.1,current=0.9;
+		while(current<limit)
 		{
-			// --- create lists
-			System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
-			double[] weights=new double[result.length];
-			for(int i=0;i<result.length;i++)
+			double tp=0;
+			double fp=0;
+			double fn=0;
+			for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 			{
-				weights[i]=result[i][test_ex_no];
-			}
-			double max=weights[0],min=weights[0];
-			for(int i=0;i<weights.length;i++)
-			{
-				if(weights[i]>max)
+				// --- create lists
+				System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
+				double[] weights=new double[result.length];
+				for(int i=0;i<result.length;i++)
 				{
-					max=weights[i];
+					weights[i]=result[i][test_ex_no];
 				}
-				if(weights[i]<min)
+				double max=weights[0],min=weights[0];
+				for(int i=0;i<weights.length;i++)
 				{
-					min=weights[i];
-				}
-			}
-			for(int i=0;i<weights.length;i++)
-			{
-				weights[i]=(weights[i]-min)/(max-min);
-			}
-			ArrayList<String> nvertex=get_vertex(vertex,weights,0.5);
-			ArrayList<vertex> vertex_list=new ArrayList<vertex>();
-			ArrayList<edge> edge_list=new ArrayList<edge>();
-			for(String v : nvertex)
-			{
-				vertex v1=new vertex(v,1);
-				vertex v2=new vertex(v,2);
-				vertex_list.add(v1);
-				vertex_list.add(v2);
-				edge_list.add(new edge(v1,v2,weights[vertex.indexOf(v)]));
-			}
-			for(String v1: nvertex)
-			{
-				OWLClass c1=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+v1));
-				for(String v2 : nvertex)
-				{
-					OWLClass c2=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+v2));
-					OWLAxiom axiom=factory.getOWLSubClassOfAxiom(c2, c1);
-					if(reasoner.isEntailed(axiom))
+					if(weights[i]>max)
 					{
-						vertex v1l=null,v2e=null;
-						for(vertex v : vertex_list)
+						max=weights[i];
+					}
+					if(weights[i]<min)
+					{
+						min=weights[i];
+					}
+				}
+				for(int i=0;i<weights.length;i++)
+				{
+					weights[i]=(weights[i]-min)/(max-min);
+				}
+				ArrayList<String> nvertex=get_vertex(vertex,weights,limit);
+				ArrayList<vertex> vertex_list=new ArrayList<vertex>();
+				ArrayList<edge> edge_list=new ArrayList<edge>();
+				for(String v : nvertex)
+				{
+					vertex v1=new vertex(v,1);
+					vertex v2=new vertex(v,2);
+					vertex_list.add(v1);
+					vertex_list.add(v2);
+					edge_list.add(new edge(v1,v2,weights[vertex.indexOf(v)]));
+				}
+				for(String v1: nvertex)
+				{
+					OWLClass c1=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+v1));
+					for(String v2 : nvertex)
+					{
+						OWLClass c2=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+v2));
+						OWLAxiom axiom=factory.getOWLSubClassOfAxiom(c2, c1);
+						if(reasoner.isEntailed(axiom))
 						{
-							if(v.name==v1&&v.type==2)
+							vertex v1l=null,v2e=null;
+							for(vertex v : vertex_list)
 							{
-								v1l=v;
+								if(v.name==v1&&v.type==2)
+								{
+									v1l=v;
+								}
+								else if(v.name==v2&&v.type==1)
+								{
+									v2e=v;
+								}
 							}
-							else if(v.name==v2&&v.type==1)
-							{
-								v2e=v;
-							}
+							edge_list.add(new edge(v1l,v2e,999999));
 						}
-						edge_list.add(new edge(v1l,v2e,999999));
 					}
 				}
-			}
-			// --check which vertices do not have incoming edges
-			ArrayList<String> has_in_e=new ArrayList<String>();
-			for(edge e : edge_list)
-			{
-				has_in_e.add(e.v2.name);
-			}
-			ArrayList<String> max_v=new ArrayList<String>();
-			for(String v : vertex)
-			{
-				if(!has_in_e.contains(v))
+				// --check which vertices do not have incoming edges
+				ArrayList<String> has_in_e=new ArrayList<String>();
+				for(edge e : edge_list)
 				{
-					max_v.add(v);
+					has_in_e.add(e.v2.name);
 				}
-			}
-			// -- check which vertices do not have out-going edges
-			ArrayList<String> has_out_e=new ArrayList<String>();
-			for(edge e : edge_list)
-			{
-				has_out_e.add(e.v1.name);
-			}
-			ArrayList<String> min_v=new ArrayList<String>();
-			for(String v : vertex)
-			{
-				if(!has_in_e.contains(v))
+				ArrayList<String> max_v=new ArrayList<String>();
+				for(String v : vertex)
 				{
-					min_v.add(v);
-				}
-			}
-
-			// --- create source and destination vertices
-			vertex vs=new vertex("s",2);
-			vertex vd=new vertex("d",1);
-			vertex_list.add(vs);
-			vertex_list.add(vd);
-			// -- create incoming edges
-			for(String v : max_v )
-			{
-				vertex vi=null;
-				for(vertex vv : vertex_list)
-				{
-					if(vv.name==v&&vv.type==1)
+					if(!has_in_e.contains(v))
 					{
-						vi=vv;
+						max_v.add(v);
 					}
 				}
-				edge_list.add(new edge(vs,vi,999999));
-			}
-			// -- create outgoing edges
-
-			for(String v : min_v )
-			{
-				vertex vi=null;
-				for(vertex vv : vertex_list)
+				// -- check which vertices do not have out-going edges
+				ArrayList<String> has_out_e=new ArrayList<String>();
+				for(edge e : edge_list)
 				{
-					if(vv.name==v&&vv.type==2)
+					has_out_e.add(e.v1.name);
+				}
+				ArrayList<String> min_v=new ArrayList<String>();
+				for(String v : vertex)
+				{
+					if(!has_in_e.contains(v))
 					{
-						vi=vv;
+						min_v.add(v);
 					}
 				}
-				edge_list.add(new edge(vi,vd,999999));
-			}
-			// --------------
 
-		} // --for loop end // all examples
+				// --- create source and destination vertices
+				vertex vs=new vertex("s",2);
+				vertex vd=new vertex("d",1);
+				vertex_list.add(vs);
+				vertex_list.add(vd);
+				// -- create incoming edges
+				for(String v : max_v )
+				{
+					vertex vi=null;
+					for(vertex vv : vertex_list)
+					{
+						if(vv.name==v&&vv.type==1)
+						{
+							vi=vv;
+						}
+					}
+					edge_list.add(new edge(vs,vi,999999));
+				}
+				// -- create outgoing edges
+
+				for(String v : min_v )
+				{
+					vertex vi=null;
+					for(vertex vv : vertex_list)
+					{
+						if(vv.name==v&&vv.type==2)
+						{
+							vi=vv;
+						}
+					}
+					edge_list.add(new edge(vi,vd,999999));
+				}
+				// --------------
+				
+			} // --for loop end // all examples
+			limit+=0.05;
+		} // limit while loop
 	}
 	public ArrayList<String> get_vertex(ArrayList<String> vertex,double[] weights,double w)
 	{
@@ -198,6 +206,20 @@ public class inde_set {
 		return tmp;
 
 	}
+	public double[][] load_test_data(String file,int no_of_columns_to_exclude)
+	{
+		double[][] temp=read_file(file);
+		double[][] temp1=new double[temp.length][temp[0].length- no_of_columns_to_exclude];
+		for(int j= no_of_columns_to_exclude+1;j<temp[0].length;j++)
+		{
+			for(int i=0;i<temp.length;i++)
+			{
+				temp1[i][j-no_of_columns_to_exclude]=temp[i][j];
+			}
+		}
+		return temp1;
+	}
+	
 	public double[][] read_file(String file)
 	{
 		double[][] temp=null;

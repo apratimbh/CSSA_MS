@@ -1,3 +1,4 @@
+/*
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,10 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import lpsolve.LpSolve;
-import lpsolve.LpSolveException;
 
-import org.ejml.simple.SimpleMatrix;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -188,13 +186,13 @@ public class matlab_cssa_m {
 			 	// ---- CSSA ------------------------------------------
 			 	
 			 	/*-----*/ 
-			 	ArrayList<ArrayList<String>> super_nodes=new ArrayList<ArrayList<String>>();
+			 	//ArrayList<ArrayList<String>> super_nodes=new ArrayList<ArrayList<String>>();
 			 	/*-----*/ 
-			 	HashMap<ArrayList<String>,Double> snv=new HashMap<ArrayList<String>,Double>();
+			 	//HashMap<ArrayList<String>,Double> snv=new HashMap<ArrayList<String>,Double>();
 			 	/*-----*/ 
-			 	HashMap<ArrayList<String>,Double> selected=new HashMap<ArrayList<String>,Double>();
+			 	//HashMap<ArrayList<String>,Double> selected=new HashMap<ArrayList<String>,Double>();
 			 	/*-----*/
-			 	
+			 	/*
 			 	ArrayList<String> root=new ArrayList<String>();
 			 	root.add("root");
 			 	
@@ -211,7 +209,7 @@ public class matlab_cssa_m {
 			 	selected.remove(root);
 			 	selected.put(root, new Double(1));
 			 	/*snv.remove(root);
-			 	snv.put(root, new Double(1));*/
+			 	snv.put(root, new Double(1));
 			 	double gm=0;
 			 	
 			 	while(limit>gm)
@@ -479,7 +477,7 @@ public class matlab_cssa_m {
 		 		{
 		 			System.out.println(fn1);
 		 			fn=fn+fn1;
-		 		}*/
+		 		}
 		 		double tp1=0,tpfp1=0,tpfn1=0;
 		 		boolean flag1=false;
 		 		for(int j=0;j<final_r.numCols();j++)
@@ -507,7 +505,7 @@ public class matlab_cssa_m {
 		 	//final_r.print();
 		 	/*System.out.println("Precision:"+((double)p/pi));
 		 	System.out.println("Recall:"+((double)r/ri));
-		 	/*System.out.println("no- "+no+" no1- "+no1);*/
+		 	/*System.out.println("no- "+no+" no1- "+no1);
 			System.out.println("Precision:"+((double)tp/(tpfp)));
 			System.out.println("Recall:"+((double)tp/(tpfn)));
 			System.out.println("Depth-avg: "+avg_depth/final_r.numCols());
@@ -543,3 +541,4 @@ public class matlab_cssa_m {
 		System.out.println();
 	}
 }
+*/

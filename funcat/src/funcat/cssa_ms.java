@@ -63,10 +63,14 @@ public class cssa_ms {
 		int k=1;
 		while(k<vertex.size())
 		{
+			double tp=0;
+			double fp=0;
+			double fn=0;
+			System.out.println("k -- :"+k);
 			for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 			{
 				// --- create lists
-				System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
+				//System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
 				double[] weights=new double[result.length];
 				for(int i=0;i<result.length;i++)
 				{
@@ -228,7 +232,7 @@ public class cssa_ms {
 							for(String tmp : current_best.ms)
 							{
 								ms.add(tmp);
-								System.out.println("Selected- "+tmp);
+								//System.out.println("Selected- "+tmp);
 								//selected.add(tmp);
 							}
 							k1++;
@@ -256,10 +260,38 @@ public class cssa_ms {
 
 					//  -------
 				} // ---- while loop (one example)
-
+				int[] test_data_this_ex=new int[test_data[test_ex_no].length];
+				for(int l=0;l<test_data[test_ex_no].length;l++)
+				{
+					test_data_this_ex[l]=(int) test_data[test_ex_no][l];
+				}
+				for(String s : selected)
+				{
+					if(test_data_this_ex[vertex.indexOf(s)]==1)
+					{
+						tp++;
+					}
+					else
+					{
+						fp++;
+					}
+				}
+				for(int l=0;l<test_data[test_ex_no].length;l++)
+				{
+					if(test_data_this_ex[l]==1)
+					{
+						if(!selected.contains(vertex.get(l)))
+						{
+							fn++;
+						}
+					}
+				}
 				// --------------
 			} // --for loop end // all examples
-		}
+			k++;
+			System.out.println("Precision: "+tp/(tp+fp));
+			System.out.println("Recall: "+tp/(tp+fn));
+		}  // ---- end of k - while loop
 	}
 	public pr calculate_pr(ArrayList<String> selected,double[] weights,ArrayList<String> vertex,int k,double[] results)
 	{
@@ -336,7 +368,7 @@ public class cssa_ms {
 		{
 			for(int i=0;i<temp.length;i++)
 			{
-				temp1[i][j]=temp[i][j];
+				temp1[i][j-no_of_columns_to_exclude]=temp[i][j];
 			}
 		}
 		return temp1;
