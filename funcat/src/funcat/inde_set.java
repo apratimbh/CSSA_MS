@@ -112,7 +112,7 @@ public class inde_set {
 					vertex v2=new vertex(v,2,vertex_num++);
 					vertex_list.add(v1);
 					vertex_list.add(v2);
-					edge_list.add(new edge(v1,v2,weights[vertex.indexOf(v)]));
+					edge_list.add(new edge(v1,v2,0,weights[vertex.indexOf(v)]));
 				}
 				for(String v1: nvertex)
 				{
@@ -135,7 +135,7 @@ public class inde_set {
 									v2e=v;
 								}
 							}
-							edge_list.add(new edge(v1l,v2e,999999));
+							edge_list.add(new edge(v1l,v2e,0,999999));
 						}
 					}
 				}
@@ -198,7 +198,7 @@ public class inde_set {
 							vi=vv;
 						}
 					}
-					edge_list.add(new edge(vs,vi,999999));
+					edge_list.add(new edge(vs,vi,0,999999));
 				}
 				// -- create outgoing edges
 
@@ -217,7 +217,7 @@ public class inde_set {
 						System.out.println("Error: "+min_v.size()+" "+max_v.size());
 						System.exit(0);
 					}
-					edge_list.add(new edge(vi,vd,999999));
+					edge_list.add(new edge(vi,vd,0,999999));
 				}
 				/*System.out.println("No of vertices: "+vertex_list.size()+" Vertex No: "+vertex_num);
 			System.exit(0);*/

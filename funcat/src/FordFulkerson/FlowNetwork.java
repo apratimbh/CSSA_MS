@@ -46,7 +46,7 @@ public class FlowNetwork {
             	System.out.println("Here:  "+e.v1.name+" - "+e.v1.type);
             }
             int w = e.v2.num;
-            double capacity = e.capacity;
+            double capacity = e.c;
             //System.out.println("v1: "+vr+" v2: "+w+" cap: "+capacity);
             addEdge(new FlowEdge(vr, w, capacity));
         }

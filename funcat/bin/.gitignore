@@ -1,10 +1,12 @@
 /FordFulkerson
-/arff_conver_test.class
-/create_tree.class
 /edge.class
+/file_create
 /fld_wrshl.class
 /funcat
 /fv_arr.class
 /inde_set.class
+/my_data
+/myue_data.class
 /vertex.class
-/file_create
+/weka_test.class
+/max_cut
