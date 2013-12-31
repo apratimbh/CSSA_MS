@@ -44,9 +44,9 @@ public class fv_arr {
 			BufferedReader br = null;
 			BufferedWriter bw = null;
 			dis=(int[][]) new ObjectInputStream(new FileInputStream("dis")).readObject();
-			path=(int[][]) new ObjectInputStream(new FileInputStream("path")).readObject();
-			part_of=(int[][]) new ObjectInputStream(new FileInputStream("part_of")).readObject();
-			is_a=(int[][]) new ObjectInputStream(new FileInputStream("is_a")).readObject();
+			//path=(int[][]) new ObjectInputStream(new FileInputStream("path")).readObject();
+			//part_of=(int[][]) new ObjectInputStream(new FileInputStream("part_of")).readObject();
+			//is_a=(int[][]) new ObjectInputStream(new FileInputStream("is_a")).readObject();
 			vertex=(ArrayList<String>) new ObjectInputStream(new FileInputStream("vertex1")).readObject();
 			int max=0,n=vertex.size();
 			for (int i=0; i<n; i++) 
@@ -148,7 +148,7 @@ public class fv_arr {
 				p++;
 			}
 			System.out.println("100%\n");
-			PrintWriter pr = new PrintWriter("fun_cellcycle_fv_arr_one.txt");    
+			PrintWriter pr = new PrintWriter("fun_cellcycle_fv_arr_one_1.txt");    
 
 			for (int i=0; i<fv_arr.length ; i++)
 			{

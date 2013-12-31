@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+
+import max_cut.Fordfulkerson;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -106,13 +109,17 @@ public class inde_set {
 					continue;*/
 				ArrayList<vertex> vertex_list=new ArrayList<vertex>();
 				ArrayList<edge> edge_list=new ArrayList<edge>();
+				vertex vs=new vertex("s",2,0);
+				vertex vd=new vertex("d",1,1);
+				vertex_list.add(vs);
+				vertex_list.add(vd);
 				for(String v : nvertex)
 				{
 					vertex v1=new vertex(v,1,vertex_num++);
 					vertex v2=new vertex(v,2,vertex_num++);
 					vertex_list.add(v1);
 					vertex_list.add(v2);
-					edge_list.add(new edge(v1,v2,0,weights[vertex.indexOf(v)]));
+					edge_list.add(new edge(v1,v2,weights[vertex.indexOf(v)],999999));
 				}
 				for(String v1: nvertex)
 				{
@@ -183,10 +190,7 @@ public class inde_set {
 			System.out.println();
 			System.exit(0);*/
 				// --- create source and destination vertices
-				vertex vs=new vertex("s",2,0);
-				vertex vd=new vertex("d",1,1);
-				vertex_list.add(vs);
-				vertex_list.add(vd);
+				
 				// -- create incoming edges
 				for(String v : max_v )
 				{
@@ -219,11 +223,41 @@ public class inde_set {
 					}
 					edge_list.add(new edge(vi,vd,0,999999));
 				}
-				/*System.out.println("No of vertices: "+vertex_list.size()+" Vertex No: "+vertex_num);
-			System.exit(0);*/
-				FlowNetwork G = new FlowNetwork(vertex_list, edge_list);
+				/*System.out.println("No of vertices: "+vertex_list.size()+" Vertex No: "+vertex_num);*/
+				Collections.swap(vertex_list, 0, 1);
+				vertex_list.get(0).num=0;
+				vertex_list.get(1).num=1;
+				vertex_list.get(0).name="s";
+				vertex_list.get(1).name="t";
+				ArrayList<String> min_cut=new ArrayList<String>();
+				selected=new ArrayList<String>();
+				Fordfulkerson f=new Fordfulkerson();
+				for(vertex vi : f.construct_r_graph(vertex_list, edge_list))
+				{
+					min_cut.add(vi.name);
+				}
+				
+				for(int i=0;i<min_cut.size();i++)
+				{
+					if(min_cut.get(i)!="s")
+					{
+						boolean flag=true;
+						for(int j=0;j<min_cut.size();j++)
+						{
+							if((i!=j)&&(min_cut.get(i)==min_cut.get(j)))
+							{
+								flag=false;
+							}
+						}
+						if(flag)
+						{
+							selected.add(min_cut.get(i));
+						}
+					}
+				}
+				/*FlowNetwork G = new FlowNetwork(vertex_list, edge_list);
 				FordFulkerson maxflow = new FordFulkerson(G, 0, 1);
-				/*double[][] dfsg=new double[vertex_list.size()][vertex_list.size()]; 
+				double[][] dfsg=new double[vertex_list.size()][vertex_list.size()]; 
 			int m[]= new int[vertex_list.size()];
 			for (int i=0; i<vertex_list.size(); i++)  
 			{  
@@ -238,50 +272,9 @@ public class inde_set {
 				}
 			}
 			dfs(dfsg,m,0,vertex_list.size());*/
-				ArrayList<Integer> min_cut=new ArrayList<Integer>();
-				ArrayList<Integer> min_cut_r=new ArrayList<Integer>();
-				selected=new ArrayList<String>();
-				for (int v = 1; v < G.V(); v++) {
-					if (maxflow.inCut(v)) 
-					{
-						min_cut.add(v);
-					}
-				}
-				for(int i : min_cut)
-				{
-					if(i>1&&!min_cut.contains(i+1))
-					{
-						min_cut_r.add(i);
-					}
-				}
-				for(vertex v : vertex_list)
-				{
-					if(min_cut_r.contains(v.num))
-					{
-						selected.add(v.name);
-					}
-				}
-				ArrayList<String> parents=new ArrayList<String>();
-				for(String node : selected)
-				{
-					OWLClass t_cls = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+node));
-					NodeSet<OWLClass> set=reasoner.getSuperClasses(t_cls, false);
-					//System.out.println("\nLabel: "+temp+"\tSuperClasses:");
-					for(Node<OWLClass> cls : set)
-					{
-						if(!cls.isTopNode())
-						{
-							String news=cls+"";
-					 		news=news.split(" ")[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
-					 		parents.add(news);
-						}
-					}
-				}
-				for(String s: parents)
-				{
-					if(!selected.contains(s))
-						selected.add(s);
-				}
+				
+				
+				
 				/*System.out.println("Visited vertices: -\n");
 			for(int i: max_cut)
 			{

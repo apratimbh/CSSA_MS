@@ -4,6 +4,7 @@ import funcat.edge;
 import funcat.vertex;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -25,10 +26,10 @@ public class Fordfulkerson {
 			Stack<vertex> tmp=find_path(adj_list);
 			if(tmp.empty())
 			{
-				System.out.println("No path left!");
+				//System.out.println("No path left!");
 				break loop;
 			}
-			System.out.println("Path length "+tmp.size()); 
+			//System.out.println("Path length "+tmp.size()); 
 			double r=compute_R(adj_list,tmp);
 			augment(adj_list,org_adj_list,tmp,r);
 		}
@@ -41,9 +42,11 @@ public class Fordfulkerson {
 		ArrayList<vertex> reachable=new ArrayList<vertex>();
 		st.add(adj_list.get(0).v);
 		HashMap<vertex,vertex> visited=new HashMap<vertex,vertex>();
+		visited.put(adj_list.get(0).v, null);
 		 while(!st.empty())
 		{
 			vertex vtmp=st.pop();
+			//System.out.println("Popped: "+vtmp.name);
 			link ltmp=adj_list.get(vtmp.num);
 			reachable.add(vtmp);
 			for(edge etmp: ltmp.elist)
@@ -68,7 +71,7 @@ public class Fordfulkerson {
 		main_loop: while(!q.isEmpty())
 		{
 			vertex vtmp=q.remove();
-			System.out.println(" vertex: "+vtmp.name);
+			//System.out.println(" vertex: "+vtmp.name);
 			if(vtmp.num==1)
 			{
 				vertex v=vtmp;
@@ -96,11 +99,11 @@ public class Fordfulkerson {
 	public void augment(ArrayList<link> adj_list,ArrayList<link> org_adj_list,Stack<vertex> list,double r)
 	{
 		vertex v1=adj_list.get(0).v;
-		 System.out.println("Augment value: "+r);
+		// System.out.println("Augment value: "+r);
 		 while(!list.empty())
 		 {
 			 vertex v2=list.pop();
-			 System.out.println("\nAugment:: "+(v1.name)+" to "+(v2.name));
+			// System.out.println("\nAugment:: "+(v1.name)+" to "+(v2.name));
 			 boolean flag=true;
 			 edge eorg=get_edge(org_adj_list,v1,v2);
 			 if(eorg!=null)
@@ -110,9 +113,9 @@ public class Fordfulkerson {
 			 //System.out.println("  Original: v1- "+v1.num+" v2- "+v2.num);
 			 edge e1=get_edge(adj_list,v1,v2);
 			 edge e2=get_edge(adj_list,v2,v1);
-			 System.out.println("\nFound: ");
-			 System.out.println("Forward:: "+(e1.v1.name)+" to "+(e1.v2.name)+" l: "+e1.l+" c: "+e1.c);
-			 System.out.println("Backward:: "+(e2.v1.name)+" to "+(e2.v2.name)+" l: "+e2.l+" c: "+e2.c);
+			 //System.out.println("\nFound: ");
+			// System.out.println("Forward:: "+(e1.v1.name)+" to "+(e1.v2.name)+" l: "+e1.l+" c: "+e1.c);
+			// System.out.println("Backward:: "+(e2.v1.name)+" to "+(e2.v2.name)+" l: "+e2.l+" c: "+e2.c);
 			 if(flag)
 			 {
 				 e1.c=e1.c-r;
@@ -125,8 +128,8 @@ public class Fordfulkerson {
 			 }
 			 if((e2.c-r)<0)
 			 {
-				 System.out.println("Error:: "+(e1.v1.name)+" to "+(e1.v2.name)+" l: "+e1.l+" c: "+e1.c);
-				 System.out.println("Error:: "+(e2.v1.name)+" to "+(e2.v2.name)+" l: "+e2.l+" c: "+e2.c);
+				 //System.out.println("Error:: "+(e1.v1.name)+" to "+(e1.v2.name)+" l: "+e1.l+" c: "+e1.c);
+				 //System.out.println("Error:: "+(e2.v1.name)+" to "+(e2.v2.name)+" l: "+e2.l+" c: "+e2.c);
 				 System.out.println("Error");
 				 System.exit(0);
 			 }
@@ -147,7 +150,7 @@ public class Fordfulkerson {
 		 {
 			 vertex v2=list.pop();
 			 tmp.add(v2);
-			 System.out.println("Path:: "+(v1.name)+" to "+(v2.name));
+			 //System.out.println("Path:: "+(v1.name)+" to "+(v2.name));
 			 edge e=get_edge(adj_list,v1,v2);
 			 if(e.c<min)
 			 {
@@ -294,19 +297,19 @@ public class Fordfulkerson {
 			}
 		}
 		//System.exit(0);
-		 System.out.println("Initial flow -- ");
+		 //System.out.println("Initial flow -- ");
 		// ---- 
 		for(edge e: e_list)
 		{
 			flow f=get_flow(flow_list,e.v1,e.v2);
-			System.out.println("From: "+(f.v1.name)+" to "+(f.v2.name)+":-- "+e.l+", "+e.c+", "+f.f+"  Also: "+e.v1.num+" to: "+e.v2.num);
+			//System.out.println("From: "+(f.v1.name)+" to "+(f.v2.name)+":-- "+e.l+", "+e.c+", "+f.f+"  Also: "+e.v1.num+" to: "+e.v2.num);
 			edge e1t=new edge(e.v1,e.v2,0,e.c-f.f);
 			edge e2t=new edge(e.v2,e.v1,0,f.f-e.l);
 			adj_list.get(e.v1.num).elist.add(e1t);
 			adj_list.get(e.v2.num).elist.add(e2t);
 		}
 		//System.exit(0);
-		System.out.println("Finding Cut -->");
+		//System.out.println("Finding Cut -->");
 		return min_cut(adj_list,org_adj_list);
 	}
 	
@@ -339,6 +342,11 @@ public class Fordfulkerson {
 		{
 			vlist.add(vi);
 		}
+		Collections.swap(vlist, 0, 1);
+		vlist.get(0).num=0;
+		vlist.get(1).num=1;
+		vlist.get(0).name="s";
+		vlist.get(1).name="t";
 		for(edge ei: e)
 		{
 			elist.add(ei);
