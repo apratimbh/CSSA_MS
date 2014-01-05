@@ -78,15 +78,15 @@ public class inde_set {
 			double fn=0;
 			for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 			{
-				// --- create lists
-				//System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
 				int vertex_num=2;
+				// load the weights of each label
 				double[] weights=new double[result.length];
 				ArrayList<String> selected=null;
 				for(int i=0;i<result.length;i++)
 				{
 					weights[i]=result[i][test_ex_no];
 				}
+				// normalize the weights between 0 and 1. (we do not want negative weights)
 				double max=weights[0],min=weights[0];
 				for(int i=0;i<weights.length;i++)
 				{
@@ -103,24 +103,29 @@ public class inde_set {
 				{
 					weights[i]=(weights[i]-min)/(max-min);
 				}
+				
+				// list of all nodes with weights above current
 				ArrayList<String> nvertex=get_vertex(vertex,weights,current);
-				//System.out.println("nvertex size: "+nvertex.size());
-				/*if(nvertex.size()==0)
-					continue;*/
+				// list of vertices in the network
 				ArrayList<vertex> vertex_list=new ArrayList<vertex>();
+				// list of edges in the network
 				ArrayList<edge> edge_list=new ArrayList<edge>();
+				// create the sourse and destination vertices
 				vertex vs=new vertex("s",2,0);
 				vertex vd=new vertex("d",1,1);
 				vertex_list.add(vs);
 				vertex_list.add(vd);
+				// each node corresponds to two vertices with an edge between them
 				for(String v : nvertex)
 				{
 					vertex v1=new vertex(v,1,vertex_num++);
 					vertex v2=new vertex(v,2,vertex_num++);
 					vertex_list.add(v1);
 					vertex_list.add(v2);
+					// lower-bound: w and capacity; inf.
 					edge_list.add(new edge(v1,v2,weights[vertex.indexOf(v)],999999));
 				}
+				// we need edges between parents and child nodes
 				for(String v1: nvertex)
 				{
 					OWLClass c1=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+v1));
@@ -142,6 +147,7 @@ public class inde_set {
 									v2e=v;
 								}
 							}
+							// lower-bound: 0 and capacity; inf.
 							edge_list.add(new edge(v1l,v2e,0,999999));
 						}
 					}
@@ -176,22 +182,7 @@ public class inde_set {
 						min_v.add(v);
 					}
 				}
-				/*System.out.println("printing-");
-			System.out.println();
-			for(String s : max_v)
-			{
-				System.out.print(s+" / ");
-			}
-			System.out.println();
-			for(String s : min_v)
-			{
-				System.out.print(s+" / ");
-			}
-			System.out.println();
-			System.exit(0);*/
-				// --- create source and destination vertices
-				
-				// -- create incoming edges
+				// nodes without incoming vertices have a new edge added: source-node
 				for(String v : max_v )
 				{
 					vertex vi=null;
@@ -204,8 +195,7 @@ public class inde_set {
 					}
 					edge_list.add(new edge(vs,vi,0,999999));
 				}
-				// -- create outgoing edges
-
+				// nodes without outgoing vertices have a new edge added: node-destination
 				for(String v : min_v )
 				{
 					vertex vi=null;
@@ -223,7 +213,8 @@ public class inde_set {
 					}
 					edge_list.add(new edge(vi,vd,0,999999));
 				}
-				/*System.out.println("No of vertices: "+vertex_list.size()+" Vertex No: "+vertex_num);*/
+				
+				// As we need to solve the max-cut problem, we swap the roles of the source and destination nodes
 				Collections.swap(vertex_list, 0, 1);
 				vertex_list.get(0).num=0;
 				vertex_list.get(1).num=1;
@@ -231,12 +222,13 @@ public class inde_set {
 				vertex_list.get(1).name="t";
 				ArrayList<String> min_cut=new ArrayList<String>();
 				selected=new ArrayList<String>();
+				// use modified FOrdFulkerson to solve the max-cut problem
 				Fordfulkerson f=new Fordfulkerson();
 				for(vertex vi : f.construct_r_graph(vertex_list, edge_list))
 				{
 					min_cut.add(vi.name);
 				}
-				
+				// choose those nodes whose only one vertex (v1'-v2') is in the cut
 				for(int i=0;i<min_cut.size();i++)
 				{
 					if(min_cut.get(i)!="s")
@@ -255,6 +247,7 @@ public class inde_set {
 						}
 					}
 				}
+				// add parents of the selected nodes into the selected list as they are logically implied
 				ArrayList<String> parents=new ArrayList<String>();
 				for(String s : selected)
 				{
@@ -311,6 +304,8 @@ public class inde_set {
 
 			StdOut.println("Max flow value = " +  maxflow.value());*/
 				// --------------
+				
+				// calculate p and r
 				int[] test_data_this_ex=new int[test_data[test_ex_no].length];
 				for(int l=0;l<test_data[test_ex_no].length;l++)
 				{
