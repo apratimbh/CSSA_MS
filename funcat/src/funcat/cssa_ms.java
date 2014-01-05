@@ -44,11 +44,13 @@ public class cssa_ms {
 	public void main() throws OWLOntologyCreationException
 	{
 		ArrayList<String> vertex = null;
+		// the vertex file contains the name of the concepts (labels) in the ontology
 		try {
 			vertex=(ArrayList<String>) new ObjectInputStream(new FileInputStream("vertex1")).readObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		// the result file from matlab
 		result=read_file("D:/matp/funcat_cellcyle_1.txt");
 		//flabels=read_file("test.arff");
 		manager = OWLManager.createOWLOntologyManager();
@@ -59,29 +61,39 @@ public class cssa_ms {
 		OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
+		// test data to check results
 		double[][] test_data=load_test_data("E:/dataset/cellcycle_FUN_test_expanded.arff",77);
 		int k=1;
+		// k is the number of labels required to be predicted
 		while(k<vertex.size())
 		{
 			double tp=0;
 			double fp=0;
 			double fn=0;
 			System.out.println("k -- :"+k);
+			// for each example in the test dataset
 			for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 			{
 				// --- create lists
 				//System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
+				
+				// load the results for each example
 				double[] weights=new double[result.length];
 				for(int i=0;i<result.length;i++)
 				{
 					weights[i]=result[i][test_ex_no];
 				}
-
-				ArrayList<Supernode> sn_list=create_supernodes(vertex,weights,vertex); 
+				
+				// list of supernodes (each supernode contains one node and snv is the weight of that node)
+				ArrayList<Supernode> sn_list=create_supernodes(vertex,weights,vertex);
+				// list of questionable supernodes
 				ArrayList<Supernode> questionable=new ArrayList<Supernode>();
+				// current selected most specific labels
 				ArrayList<String> ms=new ArrayList<String>();
+				// current selected lables (contains the  most specific nodes and nodes logically implied by a ms node)
 				ArrayList<String> selected=new ArrayList<String>();
-
+				// list of nodes which were considered while searching for splits
+				// if all nodes were considered then we can exit
 				ArrayList<String> considered_nodes=new ArrayList<String>();
 				Split current_best=null;
 
@@ -90,10 +102,10 @@ public class cssa_ms {
 				// ------ CSSA
 
 				int k1=0;
+				// k1 keeps track of the number of ms labels (nodes) selected so far
 				while(k1<k)
 				{
 					// ----- select supernode with max snv
-
 					Supernode selected_sn=sn_list.get(0);
 					int selected_sn_idx=0;
 					double max_snv=sn_list.get(0).snv;
@@ -105,27 +117,39 @@ public class cssa_ms {
 							selected_sn_idx=sn_list.indexOf(tmp);
 						}
 					}
+					// we check if its parent has been selected (that is, its parent is a most specific node or is logically implied by a ms node)
 					if(selected.contains(selected_sn.parent)||selected_sn.parent=="NIL") // If it is the child of some previously selected node
 					{
+						// if its parent is selected it is now a node in the non-decreasing graph and so we can search for a sibling 
+						//  ---- to form a split
+						// also all labels (nodes) in the supernode has been considered
 						for(String tmp : selected_sn.nodes) 
 						{
 							considered_nodes.add(tmp);
 						}
+						// we have to now search for a sibling
 						boolean supernode_child_of_ms_flag=false;
 						boolean supernode_found_sibling_flag=false;
 						boolean supernode_considered=false;
-						// --- check if child of previously selected ms node
-
+						
+						// --- check if the supernode is a child of previously selected ms node
 						main_loop: for(String ms_node : ms)
 						{
+							// remember all the nodes in the supernode are parents of the most specific node 
+							// it is child of a previously selected most specific node then its  most specific node will also be 
+							// ---  a child of the  previously selected ms node
+							// --- so here we are checking across all previously selected ms nodes
 							OWLClass c1=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+ms_node));
 							OWLClass c2=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+selected_sn.ms));
 							OWLAxiom axiom=factory.getOWLSubClassOfAxiom(c2, c1);
 
 
 							Split best_split=null;
-							if(reasoner.isEntailed(axiom)) // if it is a child of a previously selected ms node 
+							if(reasoner.isEntailed(axiom)) 
 							{
+								// if it is a child of a previously selected ms node 
+								// --- then now we need to search for a sibling
+								// --- so we search across all the questionable supernodes
 								//System.out.println("Child of ms");
 								//selected_sn.print();
 								supernode_child_of_ms_flag=true;
@@ -133,19 +157,21 @@ public class cssa_ms {
 								double curr_best_sibling_snv=0;
 								for(Supernode pot_sib : questionable) // search for siblings
 								{
+									// we need a sibling which is a child so the same ms node
 									OWLClass c3=factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+pot_sib.ms));
 									OWLAxiom axiom1=factory.getOWLSubClassOfAxiom(c3,c1);
 									if(reasoner.isEntailed(axiom1))
 									{
+										// now we need to check if they are really siblings
 										OWLAxiom axiom2=factory.getOWLSubClassOfAxiom(c2,c3);
 										OWLAxiom axiom3=factory.getOWLSubClassOfAxiom(c3,c2);
 										if(!reasoner.isEntailed(axiom2)&&!reasoner.isEntailed(axiom3))
 										{
-
 											// --- Sibling found
 											//System.out.println("Sibling found");
 											supernode_found_sibling_flag=true;
 											Split temp=new Split(selected_sn,pot_sib);
+											// there can be many siblings but we select only the one which maximizes the weight (snv)
 											if(temp.snv>curr_best_sibling_snv)
 											{
 												curr_best_sibling_snv=temp.snv;
@@ -154,6 +180,8 @@ public class cssa_ms {
 										}
 									}
 								} // end of search
+								// if we have found a sibling that means we have a new split
+								// --- so we compare it with the current best split (by snv)
 								if(supernode_found_sibling_flag) // if a sibling has been found
 								{
 									Split temp=best_split;
@@ -172,7 +200,7 @@ public class cssa_ms {
 									}
 
 								}
-								else 
+								else // if no sibling found then add to the list of questionable supernodes
 								{
 									questionable.add(selected_sn);
 								}
@@ -181,13 +209,12 @@ public class cssa_ms {
 						}    // -- end of main loop
 
 						// --- afterwards
+						// if the supernode is not the child of a previosuly selected ms node 
 						if(!supernode_child_of_ms_flag||(selected_sn.parent=="NIL"))
 						{
-							//System.out.println("1");
+							// we create a new split with just the supernode
 							Split temp=new Split(selected_sn,null);
-							//System.out.println("Split value- "+temp.snv);
-							//System.out.println("Here: ");
-							//selected_sn.print();
+							// Then update the current best split (if the new split is better)
 							if(current_best==null)
 							{
 								current_best=temp;
@@ -200,30 +227,19 @@ public class cssa_ms {
 									supernode_considered=true;
 								}
 							}
+							// cleanup returns a list of supernodes consiting of single nodes ehich can be expanded by merging parent nodes
 							sn_list=cleanup(vertex,considered_nodes,weights);
 						}
-						/*else if(!supernode_child_of_ms_flag&&(selected_sn.parent=="NIL")) 
-					{
-						System.out.println("2");
-						/*for(String tmp : selected_sn.nodes)
-						{
-							selected.add(tmp);
-							//System.out.println("Selected- "+tmp);
-						}
-						System.out.println("Selected-ms: "+selected_sn.ms);
-						ms.add(selected_sn.ms);
-						k++;
-						considered_nodes.clear();
-						sn_list=cleanup(vertex,selected,weights);
-					}*/
 						else 
 						{
-							//System.out.println("3");
 							sn_list=cleanup(vertex,considered_nodes,weights);
 						}
+						// cleanup tells us how many nodes are left to be considered
+
 						if(sn_list==null)
 						{
-							//System.out.println("Entered");
+							// if all nodes considered
+							// --- select the split with highest snv
 							for(String tmp : current_best.nodes)
 							{
 								selected.add(tmp);
@@ -232,8 +248,6 @@ public class cssa_ms {
 							for(String tmp : current_best.ms)
 							{
 								ms.add(tmp);
-								//System.out.println("Selected- "+tmp);
-								//selected.add(tmp);
 							}
 							k1++;
 							current_best=null;
@@ -243,16 +257,11 @@ public class cssa_ms {
 								considered_nodes.add(s);
 							}
 							sn_list=cleanup(vertex,selected,weights);
-							/*System.out.println("");
-						for(String s : selected)
-						{
-							System.out.print(s+", ");
-						}
-						System.out.println("");*/
 						}
 					} // -- end
 					else
 					{
+						// merge selected supernode with its parent (if part from line 121)
 						String parent=sn_list.get(selected_sn_idx).parent;
 						selected_sn.add(parent, weights[vertex.indexOf(parent)]);
 						sn_list.set(selected_sn_idx,selected_sn);
@@ -264,10 +273,11 @@ public class cssa_ms {
 				int[] test_data_this_ex=new int[test_data[test_ex_no].length];
 				for(int l=0;l<test_data[test_ex_no].length;l++)
 				{
-					test_data_this_ex[l]=(int) test_data[test_ex_no][l];
+					test_data_this_ex[l]=(int) test_data[test_ex_no][l]; // actual labels for this examples (from test data)
 				}
 				for(String s : selected)
 				{
+					// if a node (label) has been selected and it is present in the test data then it is a true positive 
 					if(test_data_this_ex[vertex.indexOf(s)]==1)
 					{
 						tp++;
@@ -279,8 +289,10 @@ public class cssa_ms {
 				}
 				for(int l=0;l<test_data[test_ex_no].length;l++)
 				{
+					//  if a node (label) is present in the test data then it should be present in our selected labels 
 					if(test_data_this_ex[l]==1)
 					{
+						// if it is not its a false positive
 						if(!selected.contains(vertex.get(l)))
 						{
 							fn++;
@@ -288,8 +300,9 @@ public class cssa_ms {
 					}
 				}
 				// --------------
-			} // --for loop end // all examples
+			} // --for loop end // all examples 
 			k++;
+			// output p and r for each value of k
 			System.out.println("Precision: "+tp/(tp+fp));
 			System.out.println("Recall: "+tp/(tp+fn));
 		}  // ---- end of k - while loop

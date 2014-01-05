@@ -255,6 +255,27 @@ public class inde_set {
 						}
 					}
 				}
+				ArrayList<String> parents=new ArrayList<String>();
+				for(String s : selected)
+				{
+					OWLClass vertex_c = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+s));
+					NodeSet<OWLClass> set=reasoner.getSuperClasses(vertex_c, true);
+			 		for(Node<OWLClass> cls : set)
+			 	 	{
+			 	 		if(!cls.isTopNode())
+			 	 		{
+			 	 			String news=cls+"";
+			 	 			String[] part=news.split(" ");
+			 	 			part[1]=part[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
+			 	 			if(!parents.contains(part[1]))
+			 	 				parents.add(part[1]);
+			 	 		}
+			 	 	}
+				}
+				for(String s : parents)
+				{
+					selected.add(s);
+				}
 				/*FlowNetwork G = new FlowNetwork(vertex_list, edge_list);
 				FordFulkerson maxflow = new FordFulkerson(G, 0, 1);
 				double[][] dfsg=new double[vertex_list.size()][vertex_list.size()]; 
