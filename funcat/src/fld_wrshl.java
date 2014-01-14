@@ -98,7 +98,7 @@ public class fld_wrshl {
 	public static int[][] path,dis,is_a,part_of;
 	public static void main(String[] args) throws OWLOntologyCreationException
 	{
-		File file = new File("/host/ontologies/cellcycle_FUN.owl"); //go_daily-termdb  treeOnt
+		File file = new File("E:/ontologies/cellcycle_FUN.owl"); //go_daily-termdb  treeOnt
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 	 	OWLOntology go = manager.loadOntologyFromOntologyDocument(file);
 	 	OWLDataFactory dataFactory = manager.getOWLDataFactory();

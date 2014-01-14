@@ -72,7 +72,7 @@ public class arff_conver_test {
 		try {
 			vertex=(ArrayList<String>) new ObjectInputStream(new FileInputStream("vertex1")).readObject();
 			br = new BufferedReader(new FileReader("E:/dataset/cellcycle_FUN.test.arff"));
-			bw = new BufferedWriter(new FileWriter("E:/dataset/cellcycle_FUN_test_expanded.arff"));
+			bw = new BufferedWriter(new FileWriter("E:/dataset/cellcycle_FUN_test_expanded_11.arff"));
 			String line;
 			int c=1;
 			boolean flag=true;
