@@ -118,21 +118,25 @@ public class cssa {
 				int k=0;
 				// k1 keeps track of the number of ms labels (nodes) selected so far
 				while(k<current)
-				{
+				{	
 					// ----- select supernode with max snv
 					Supernode selected_sn=sn_list.get(0);
 					int selected_sn_idx=0;
 					double max_snv=sn_list.get(0).snv;
+					// selected_sn is the supernode with the highest snv
+					
 					for(Supernode tmp : sn_list)
 					{
 						if(tmp.snv>max_snv)
 						{
 							selected_sn=tmp;
 							selected_sn_idx=sn_list.indexOf(tmp);
+							max_snv=tmp.snv;
 						}
 					}
-					// selected_sn is the supernode with the highest snv
-
+					
+					/*System.out.println("Selected supernode: ");
+					selected_sn.print();*/
 					// check if all its parents are selected
 					if(all_parents_selected(selected,selected_sn.parents_list))
 					{
@@ -159,8 +163,13 @@ public class cssa {
 					}
 
 				}
-
-
+				//System.exit(0);
+				/*System.out.println("Num: "+test_ex_no);
+				for(String tmp: selected)
+				{
+					System.out.println(tmp);
+				}
+				System.out.println("--------------------------");*/
 				// ----------------------
 				int[] test_data_this_ex=new int[test_data[test_ex_no].length];
 				for(int l=0;l<test_data[test_ex_no].length;l++)
@@ -228,7 +237,7 @@ public class cssa {
 			}
 		}
 		// ------------------
-		double new_snv=(s1.snv*s1.nodes.size()+s2.snv+s2.nodes.size())/(s1.nodes.size()+s2.nodes.size());
+		double new_snv=(s1.snv*s1.nodes.size()+s2.snv*s2.nodes.size())/(s1.nodes.size()+s2.nodes.size());
 		Supernode tmp=new Supernode(tmp_node_list,new_snv,tmp_parent_list);
 		return tmp;
 	}
@@ -262,6 +271,7 @@ public class cssa {
 			{
 				selected_sn=tmp;
 				selected_sn_idx=sn_list.indexOf(tmp);
+				min_snv=tmp.snv;
 			}
 		}
 

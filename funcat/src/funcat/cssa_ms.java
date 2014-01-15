@@ -115,6 +115,7 @@ public class cssa_ms {
 						{
 							selected_sn=tmp;
 							selected_sn_idx=sn_list.indexOf(tmp);
+							max_snv=tmp.snv;
 						}
 					}
 					// we check if its parent has been selected (that is, its parent is a most specific node or is logically implied by a ms node)
@@ -505,8 +506,15 @@ class Supernode {
 	}
 	public void print()
 	{
-		System.out.print("Supernode: ");
+		System.out.println("\nSupernode: ");
+		System.out.println("Nodes:");
 		for(String tmp : nodes)
+		{
+			System.out.print(tmp+", ");
+		}
+		System.out.println("Snv: "+this.snv);
+		System.out.println("Patents:");
+		for(String tmp : parents_list)
 		{
 			System.out.print(tmp+", ");
 		}
