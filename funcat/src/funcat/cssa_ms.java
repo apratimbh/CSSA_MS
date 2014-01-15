@@ -76,14 +76,14 @@ public class cssa_ms {
 			{
 				// --- create lists
 				//System.out.println("\n\nNew example - - - - - - - - - -"+test_ex_no);
-				
+
 				// load the results for each example
 				double[] weights=new double[result.length];
 				for(int i=0;i<result.length;i++)
 				{
 					weights[i]=result[i][test_ex_no];
 				}
-				
+
 				// list of supernodes (each supernode contains one node and snv is the weight of that node)
 				ArrayList<Supernode> sn_list=create_supernodes(vertex,weights,vertex);
 				// list of questionable supernodes
@@ -131,7 +131,7 @@ public class cssa_ms {
 						boolean supernode_child_of_ms_flag=false;
 						boolean supernode_found_sibling_flag=false;
 						boolean supernode_considered=false;
-						
+
 						// --- check if the supernode is a child of previously selected ms node
 						main_loop: for(String ms_node : ms)
 						{
@@ -269,7 +269,7 @@ public class cssa_ms {
 
 					//  -------
 				} // ---- while loop (one example)
-				
+
 				int[] test_data_this_ex=new int[test_data[test_ex_no].length];
 				for(int l=0;l<test_data[test_ex_no].length;l++)
 				{
@@ -373,7 +373,7 @@ public class cssa_ms {
 		}
 		return temp;
 	}
-	
+
 	public double[][] load_test_data(String file,int no_of_columns_to_exclude)
 	{
 		double[][] temp=read_file(file);
@@ -387,7 +387,7 @@ public class cssa_ms {
 		}
 		return temp1;
 	}
-	
+
 	public double[][] read_file(String file)
 	{
 		double[][] temp=null;
@@ -438,6 +438,7 @@ public class cssa_ms {
 
 class Supernode {
 	ArrayList<String> nodes=null;
+	ArrayList<String> parents_list=null;
 	String parent="";
 	String ms="";
 	double snv=0;
@@ -456,6 +457,36 @@ class Supernode {
 		else
 		{
 			this.parent="NIL";
+		}
+	}
+	public Supernode(ArrayList<String> node_list,double val,ArrayList<String> parents)
+	{
+		nodes=new ArrayList<String>();
+		parents_list=new ArrayList<String>();
+		for(String node : node_list)
+		{
+			nodes.add(node);
+			this.size++;
+		}
+		this.snv=val;
+		for(String parent : parents)
+		{
+			this.parents_list.add(parent);
+		}
+	}
+	public Supernode(String  node,double val,ArrayList<String> parents)
+	{
+		parents_list=new ArrayList<String>();
+		nodes=new ArrayList<String>();
+		nodes.add(node);
+		this.size++;
+		this.snv=val;
+		if(parents.size()!=0)
+		{
+			for(String parent : parents)
+			{
+				this.parents_list.add(parent);
+			}
 		}
 	}
 	public void add(String node,double val)

@@ -103,14 +103,22 @@ public class inde_set {
 				{
 					weights[i]=(weights[i]-min)/(max-min);
 				}
-				
+				double[] tmp_weights=new double[vertex.size()];
+				for(int i=0;i<weights.length;i++)
+				{
+					tmp_weights[i]=avg_parents_weight(weights,vertex,vertex.get(i));
+				}
+				for(int i=0;i<weights.length;i++)
+				{
+					weights[i]=tmp_weights[i];
+				}
 				// list of all nodes with weights above current
 				ArrayList<String> nvertex=get_vertex(vertex,weights,current);
 				// list of vertices in the network
 				ArrayList<vertex> vertex_list=new ArrayList<vertex>();
 				// list of edges in the network
 				ArrayList<edge> edge_list=new ArrayList<edge>();
-				// create the sourse and destination vertices
+				// create the source and destination vertices
 				vertex vs=new vertex("s",2,0);
 				vertex vd=new vertex("d",1,1);
 				vertex_list.add(vs);
@@ -247,12 +255,17 @@ public class inde_set {
 						}
 					}
 				}
+				/*for(String s : selected)
+				{
+					System.out.println(s);
+				}
+				System.exit(0);*/
 				// add parents of the selected nodes into the selected list as they are logically implied
 				ArrayList<String> parents=new ArrayList<String>();
 				for(String s : selected)
 				{
 					OWLClass vertex_c = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+s));
-					NodeSet<OWLClass> set=reasoner.getSuperClasses(vertex_c, true);
+					NodeSet<OWLClass> set=reasoner.getSuperClasses(vertex_c,false);
 			 		for(Node<OWLClass> cls : set)
 			 	 	{
 			 	 		if(!cls.isTopNode())
@@ -335,13 +348,35 @@ public class inde_set {
 			} // --for loop end // all examples
 
 			System.out.println("Current-limit--"+current+"\n");
-			current-=0.05;
+			current-=0.02;
 
 			System.out.println("Precision: "+tp/(tp+fp));
 			System.out.println("Recall: "+tp/(tp+fn));
 			System.out.println();
 		}
 	}
+	
+	public double avg_parents_weight(double[] weights,ArrayList<String> vertex,String node)
+	{
+		double avg=0;
+		int c=1;
+		OWLClass vertex_c = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+node));
+		NodeSet<OWLClass> set=reasoner.getSuperClasses(vertex_c, false);
+		avg+=weights[vertex.indexOf(node)];
+ 		for(Node<OWLClass> cls : set)
+ 	 	{
+ 	 		if(!cls.isTopNode())
+ 	 		{
+ 	 			String news=cls+"";
+ 	 			String[] part=news.split(" ");
+ 	 			part[1]=part[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
+ 	 			avg+=weights[vertex.indexOf(part[1])];
+ 	 			c++;
+ 	 		}
+ 	 	}
+ 		return (double)avg/c;
+	}
+	
 	public double[][] load_test_data(String file,int no_of_columns_to_exclude)
 	{
 		double[][] temp=read_file(file);
