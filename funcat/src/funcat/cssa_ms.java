@@ -440,6 +440,7 @@ public class cssa_ms {
 class Supernode {
 	ArrayList<String> nodes=null;
 	ArrayList<String> parents_list=null;
+	ArrayList<String> ms_list=null;
 	String parent="";
 	String ms="";
 	double snv=0;
@@ -475,13 +476,35 @@ class Supernode {
 			this.parents_list.add(parent);
 		}
 	}
+	public Supernode(ArrayList<String> node_list,double val,ArrayList<String> parents,ArrayList<String> ms_list)
+	{
+		nodes=new ArrayList<String>();
+		parents_list=new ArrayList<String>();
+		this.ms_list=new ArrayList<String>();
+		for(String node : node_list)
+		{
+			nodes.add(node);
+			this.size++;
+		}
+		this.snv=val;
+		for(String parent : parents)
+		{
+			this.parents_list.add(parent);
+		}
+		for(String ms : ms_list)
+		{
+			this.ms_list.add(ms);
+		}
+	}
 	public Supernode(String  node,double val,ArrayList<String> parents)
 	{
 		parents_list=new ArrayList<String>();
 		nodes=new ArrayList<String>();
+		ms_list=new ArrayList<String>();
 		nodes.add(node);
 		this.size++;
 		this.snv=val;
+		this.ms_list.add(node);
 		if(parents.size()!=0)
 		{
 			for(String parent : parents)
@@ -525,6 +548,7 @@ class Supernode {
 class Split {
 	ArrayList<String> nodes=new ArrayList<String>();
 	ArrayList<String> ms=new ArrayList<String>();
+	ArrayList<Supernode> cointained_supernodes=new ArrayList<Supernode>();
 	String parent="";
 	double snv=0;
 	public Split(Supernode node1,Supernode node2)
@@ -545,7 +569,28 @@ class Split {
 			this.snv=(node1.snv*node1.size+node2.snv*node2.size)/(node1.size+node2.size);
 		}
 		else
-			snv=(node1.snv*node1.size)/(node1.size);
+			this.snv=(node1.snv*node1.size)/(node1.size);
+	}
+	public Split(ArrayList<String> nodes,ArrayList<String> vertex,ArrayList<String> ms_list,String parent_ms,double[] weights,ArrayList<Supernode> contained_supernodes)
+	{
+		// here parent is the ms node the split is a child of
+		if(parent_ms!=null)
+			this.parent=parent_ms;
+		double avg=0;
+		for(String tmp : nodes)
+		{
+			this.nodes.add(tmp);
+			avg+=weights[vertex.indexOf(tmp)];
+		}
+		for(String tmp : ms_list)
+		{
+			this.ms.add(tmp);
+		}
+		for(Supernode sn : contained_supernodes)
+		{
+			this.cointained_supernodes.add(sn);
+		}
+		this.snv=(double)avg/nodes.size();
 	}
 }
 class pr {

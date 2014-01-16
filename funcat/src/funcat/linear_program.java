@@ -118,7 +118,7 @@ public class linear_program {
 	 	} 
 		// -----------------------------------------
 		
-		int limit=10,current=1;
+		int limit=20,current=1;
 		while(current<limit)
 		{
 			double tp=0;
