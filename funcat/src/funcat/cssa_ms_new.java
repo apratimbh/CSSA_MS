@@ -218,6 +218,10 @@ public class cssa_ms_new {
 							ms_list.add(ms);
 							k++;
 						}
+						for(Supernode sn: current_best.cointained_supernodes)
+						{
+							questionable.remove(sn);
+						}
 					}
 					else
 					{
