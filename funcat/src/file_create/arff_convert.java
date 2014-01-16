@@ -74,7 +74,7 @@ public class arff_convert {
 		try {
 			vertex=(ArrayList<String>) new ObjectInputStream(new FileInputStream("vertex1")).readObject();
 			br = new BufferedReader(new FileReader("E:/dataset/cellcycle_FUN.test.arff"));
-			bw = new BufferedWriter(new FileWriter("E:/dataset/cellcycle_FUN_test_expanded.arff"));
+			bw = new BufferedWriter(new FileWriter("E:/dataset/cellcycle_FUN_test_expanded_1.arff"));
 			String line;
 			int c=1;
 			boolean flag=true;
@@ -87,16 +87,16 @@ public class arff_convert {
 					{
 						if(!line.contains("hierarchical"))
 						{
-							bw.write(line+"\n");
-							bw.flush();
+							/*bw.write(line+"\n");
+							bw.flush();*/
 						}
 						else
 							flag=false;
 					}
 					else
 					{
-						for(String temp : vertex)
-							bw.write("@attribute "+temp+" {0,1}\n");
+						/*for(String temp : vertex)
+							bw.write("@attribute "+temp+" {0,1}\n");*/
 						break l1;
 					}
 				}
@@ -104,7 +104,7 @@ public class arff_convert {
 			String[] gene=null;
 			String out="";
 			String label_vec="";
-			bw.write("\n@data\n\n");
+			//bw.write("\n@data\n\n");
 			bw.flush();
 			c=0;
 			while((line = br.readLine())!=null)
@@ -115,6 +115,7 @@ public class arff_convert {
 					System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
 					out="";
 					label_vec="";
+					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
 					String gene_l=part[part.length-1];
 					out=line.substring(0,line.length()-1-gene_l.length());

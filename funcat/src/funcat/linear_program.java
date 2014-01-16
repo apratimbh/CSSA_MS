@@ -237,7 +237,7 @@ public class linear_program {
 					}
 				}
 			} // --for loop end // all examples
-
+			tp+=result[0].length;
 			System.out.println("Current-limit--"+current+"\n");
 			current++;
 
