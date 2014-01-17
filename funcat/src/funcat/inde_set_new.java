@@ -117,9 +117,15 @@ public class inde_set_new {
 				selected=new ArrayList<String>();
 				int k=0;
 				int num=current;
+				//System.out.println("\n\nexample no: "+test_ex_no+" current: "+current);
 				main_loop: while(true)
 				{
 					ArrayList<String> nvertex=get_vertex(vertex,weights,num);
+					/*System.out.println("Selected nodes: ");
+					for(String s: nvertex)
+					{
+						System.out.println("num: "+num+" -- "+s+" - "+weights[vertex.indexOf(s)]);
+					}*/
 					// list of vertices in the network
 					ArrayList<vertex> vertex_list=new ArrayList<vertex>();
 					// list of edges in the network
@@ -443,7 +449,7 @@ public class inde_set_new {
 		{
 			tmp_vertex.add(s);
 		}
-		sort(tmp_vertex,weights,num);
+		sort(tmp_vertex,tmp_weights,num);
 		for(int i=0;i<num;i++)
 		{
 			tmp.add(tmp_vertex.get(i));
