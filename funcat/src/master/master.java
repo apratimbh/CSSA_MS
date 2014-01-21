@@ -38,6 +38,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 import pr_curve.curve;
 import pr_curve.curve_point;
+import funcat.cssa;
 import funcat.cssa_ms_new;
 import funcat.inde_set_new;
 
@@ -467,10 +468,16 @@ public class master
 			}
 		}
 		
+		cssa cs=new cssa();
+		curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
+		
 		cssa_ms_new cms=new cssa_ms_new();
 		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
+		
 		inde_set_new isn=new inde_set_new();
 		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
+		
+		output_curve(cssa_curve,"curve_cssa.txt");
 		output_curve(cssa_ms_curve,"curve_cssa_ms.txt");
 		output_curve(inde_curve,"curve_inde_set.txt");
 	}

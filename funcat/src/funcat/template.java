@@ -39,11 +39,11 @@ public class template {
 	OWLDataFactory factory;
 
 
-	public static void main(String[] args) throws OWLOntologyCreationException
+	/*public static void main(String[] args) throws OWLOntologyCreationException
 	{
 		cssa o=new cssa();
 		o.main();
-	}
+	}*/
 
 	public void main() throws OWLOntologyCreationException
 	{
