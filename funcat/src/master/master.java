@@ -468,9 +468,9 @@ public class master
 		}
 		
 		cssa_ms_new cms=new cssa_ms_new();
-		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex, limit);
+		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
 		inde_set_new isn=new inde_set_new();
-		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, limit);
+		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
 		output_curve(cssa_ms_curve,"curve_cssa_ms.txt");
 		output_curve(inde_curve,"curve_inde_set.txt");
 	}
