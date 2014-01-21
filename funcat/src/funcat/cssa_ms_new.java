@@ -30,6 +30,9 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 
+import pr_curve.curve;
+import pr_curve.curve_point;
+
 public class cssa_ms_new {
 	public double[][] result=null,flabels=null,test_data=null;
 	public double[][] pr_val=new double[10][3];
@@ -39,24 +42,18 @@ public class cssa_ms_new {
 	OWLDataFactory factory;
 
 
-	public static void main(String[] args) throws OWLOntologyCreationException
+	/*public static void main(String[] args) throws OWLOntologyCreationException
 	{
 		cssa_ms_new o=new cssa_ms_new();
 		o.main();
-	}
+	}*/
 
-	public void main() throws OWLOntologyCreationException
+	public curve main(String result_file,String expanded_test_file,String ontology_file,ArrayList<String> vertex,double limit) throws OWLOntologyCreationException
 	{
-		ArrayList<String> vertex = null;
-		try {
-			vertex=(ArrayList<String>) new ObjectInputStream(new FileInputStream("vertex1")).readObject();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		result=read_file("D:/matp/funcat_cellcyle_1.txt");
+		result=read_file(result_file);
 		//result=read_file("fun_cellcycle_result.txt");
 		manager = OWLManager.createOWLOntologyManager();
-		go = manager.loadOntologyFromOntologyDocument(new File("E:/ontologies/cellcycle_FUN.owl"));
+		go = manager.loadOntologyFromOntologyDocument(new File(ontology_file));
 		System.out.println("Loaded ontology: " + go.getOntologyID().toString());
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
@@ -64,11 +61,12 @@ public class cssa_ms_new {
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
 
-		test_data=load_test_data("E:/dataset/cellcycle_FUN_test_expanded.arff",77);
+		test_data=load_test_data(expanded_test_file,77);
 
 
 
-		int limit=10,current=1;
+		int current=1;
+		curve prc=new curve();
 		while(current<limit)
 		{
 			double tp=0;
@@ -280,7 +278,10 @@ public class cssa_ms_new {
 			System.out.println("Precision: "+tp/(tp+fp));
 			System.out.println("Recall: "+tp/(tp+fn));
 			System.out.println();
+			curve_point pt=new curve_point(tp/(tp+fp),tp/(tp+fn));
+			prc.add(pt);
 		}
+		return prc;
 	}
 
 	public double new_snv(ArrayList<String> nodes,ArrayList<String> vertex,double[] weights)

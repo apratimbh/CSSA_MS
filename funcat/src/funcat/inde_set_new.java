@@ -30,6 +30,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 
+import pr_curve.curve;
+import pr_curve.curve_point;
 import FordFulkerson.FordFulkerson;
 import FordFulkerson.FlowNetwork;
 import FordFulkerson.StdOut;
@@ -44,24 +46,18 @@ public class inde_set_new {
 	OWLDataFactory factory;
 
 
-	public static void main(String[] args) throws OWLOntologyCreationException
+	/*public static void main(String[] args) throws OWLOntologyCreationException
 	{
 		inde_set_new o=new inde_set_new();
 		o.main();
-	}
+	}*/
 
-	public void main() throws OWLOntologyCreationException
+	public curve main(String result_file,String expanded_test_file,String ontology_file,ArrayList<String> vertex,double limit) throws OWLOntologyCreationException
 	{
-		ArrayList<String> vertex = null;
-		try {
-			vertex=(ArrayList<String>) new ObjectInputStream(new FileInputStream("vertex1")).readObject();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		result=read_file("D:/matp/funcat_cellcyle_1.txt");
+		result=read_file(result_file);
 		//result=read_file("fun_cellcycle_result.txt");
 		manager = OWLManager.createOWLOntologyManager();
-		go = manager.loadOntologyFromOntologyDocument(new File("E:/ontologies/cellcycle_FUN.owl"));
+		go = manager.loadOntologyFromOntologyDocument(new File(ontology_file));
 		System.out.println("Loaded ontology: " + go.getOntologyID().toString());
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
 		ConsoleProgressMonitor progressMonitor = new ConsoleProgressMonitor();
@@ -69,8 +65,10 @@ public class inde_set_new {
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
 
-		test_data=load_test_data("E:/dataset/cellcycle_FUN_test_expanded.arff",77);
-		int limit=20,current=1;
+		test_data=load_test_data(expanded_test_file,77);
+		
+		int current=1;
+		curve prc=new curve();
 		while(current<limit)
 		{
 			double tp=0;
@@ -376,8 +374,10 @@ public class inde_set_new {
 
 			System.out.println("Precision: "+tp/(tp+fp));
 			System.out.println("Recall: "+tp/(tp+fn));
-			System.out.println();
+			System.out.println();curve_point pt=new curve_point(tp/(tp+fp),tp/(tp+fn));
+			prc.add(pt);
 		}
+		return prc;
 	}
 
 	public double avg_parents_weight(double[] weights,ArrayList<String> vertex,String node)
