@@ -611,9 +611,9 @@ public class master
 		System.out.println("Creating kernel file");
 		create_fv_arr(fv_arr_file,vertex);
 		System.out.println("Creating training file");
-		convert_arff_file_expand(vertex,train_file,converted_train_file);
+		convert_arff_file(vertex,train_file,converted_train_file);
 		System.out.println("Creating validation file");
-		convert_arff_file_expand(vertex,valid_file,converted_vaild_file);
+		convert_arff_file(vertex,valid_file,converted_vaild_file);
 		System.out.println("Creating test file");
 		convert_arff_file(vertex,test_file,converted_test_file);
 		System.out.println("Creating merged file");
