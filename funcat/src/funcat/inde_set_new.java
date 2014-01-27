@@ -52,7 +52,7 @@ public class inde_set_new {
 		o.main();
 	}*/
 
-	public curve main(String result_file,String expanded_test_file,String ontology_file,ArrayList<String> vertex,double limit) throws OWLOntologyCreationException
+	public curve main(String result_file,String expanded_test_file,String ontology_file,ArrayList<String> vertex,int columns,int limit) throws OWLOntologyCreationException
 	{
 		result=read_file(result_file);
 		//result=read_file("fun_cellcycle_result.txt");
@@ -65,7 +65,7 @@ public class inde_set_new {
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
 
-		test_data=load_test_data(expanded_test_file,77);
+		test_data=load_test_data(expanded_test_file,columns);
 		
 		int current=1;
 		curve prc=new curve();

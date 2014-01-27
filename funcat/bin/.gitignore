@@ -1,7 +1,14 @@
 /FordFulkerson
 /file_create
-/fld_wrshl.class
 /funcat
-/master.class
+/edge.class
+/fld_wrshl.class
+/fv_arr.class
+/inde_set.class
 /master
+/max_cut
+/my_data
+/myue_data.class
 /pr_curve
+/vertex.class
+/weka_test.class

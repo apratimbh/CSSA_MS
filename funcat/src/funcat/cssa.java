@@ -48,7 +48,7 @@ public class cssa {
 		o.main();
 	}*/
 
-	public curve main(String result_file,String expanded_test_file,String ontology_file,ArrayList<String> vertex,double limit) throws OWLOntologyCreationException
+	public curve main(String result_file,String expanded_test_file,String ontology_file,ArrayList<String> vertex,int columns,int limit) throws OWLOntologyCreationException
 	{
 		result=read_file(result_file);
 		//result=read_file("fun_cellcycle_result.txt");
@@ -61,7 +61,7 @@ public class cssa {
 		reasoner = reasonerFactory.createReasoner(go, config);
 		factory = manager.getOWLDataFactory();
 
-		test_data=load_test_data(expanded_test_file,77);
+		test_data=load_test_data(expanded_test_file,columns);
 
 
 
@@ -133,6 +133,8 @@ public class cssa {
 						}
 					}
 					
+					//selected_sn.print();
+					
 					/*System.out.println("Selected supernode: ");
 					selected_sn.print();*/
 					// check if all its parents are selected
@@ -199,7 +201,7 @@ public class cssa {
 
 			System.out.println("Current-limit--"+current+"\n");
 			current++;
-
+			//tp=tp-result[0].length;
 			System.out.println("Precision: "+tp/(tp+fp));
 			System.out.println("Recall: "+tp/(tp+fn));
 			System.out.println();
@@ -303,7 +305,7 @@ public class cssa {
 		ArrayList<Supernode> temp=new ArrayList<Supernode>();
 		if(vertex.size()!=w.length)
 		{
-			System.out.println("Dimensions mis-match");
+			System.out.println("Dimensions mis-match: weights-"+w.length+" v: "+vertex.size());
 			System.exit(1);
 		}
 		// create a supernode for each node

@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -39,6 +40,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 import pr_curve.curve;
 import pr_curve.curve_point;
 import funcat.cssa;
+import funcat.cssa_ms_fast;
 import funcat.cssa_ms_new;
 import funcat.inde_set_new;
 
@@ -105,6 +107,34 @@ public class master
 		}
 	}
 
+	public int get_number_of_attr(String filename)
+	{
+		BufferedReader br = null;
+		int c=0;
+		try {
+			br = new BufferedReader(new FileReader(filename));
+			String line;
+			String data="@DATA";
+			String attr="@ATTRIBUTE";
+			loop: while((line = br.readLine())!=null)
+			{
+				if(line.contains(attr)||line.contains(attr.toLowerCase()))
+				{
+					c++;
+				}
+				if(line.contains(data)||line.contains(data.toLowerCase()))
+				{
+					break loop;
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return (c-1);
+	}
+	
 	public static String get_parent(String s)
 	{
 		return s.substring(0,s.lastIndexOf('.'));
@@ -136,9 +166,9 @@ public class master
 
 	public void create_fv_arr(String outputfile,ArrayList<String> vertex)
 	{
-		System.out.println("Creating kernel file----");
+		//System.out.println("Creating kernel file----");
 		double[][] fv_arr=new double[vertex.size()][vertex.size()];
-		System.out.println(".");
+		//System.out.println(".");
 		int p=0,prev=0;
 		for(String temp : vertex)
 		{
@@ -154,14 +184,14 @@ public class master
 			vec.set(vertex.indexOf(temp),new Double(1));
 			OWLClass t_cls = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+temp));
 			NodeSet<OWLClass> set=reasoner.getSuperClasses(t_cls, false);
-			System.out.println("\nLabel: "+temp+"\tSuperClasses:");
+			//System.out.println("\nLabel: "+temp+"\tSuperClasses:");
 			for(Node<OWLClass> cls : set)
 			{
 				if(!cls.isTopNode())
 				{
 					String news=cls+"";
 					news=news.split(" ")[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
-					System.out.println("\t\t\t"+news);
+					//System.out.println("\t\t\t"+news);
 					if(vertex.contains(news))
 					{
 						int i=vertex.indexOf(news);
@@ -196,6 +226,67 @@ public class master
 		}    
 	}
 
+	public int get_index_cat(String in)
+	{
+		int idx=-1;
+		for(int i=0;i<in.length();i++)
+		{
+			if(Character.isAlphabetic(in.charAt(i)))
+			{
+				if(idx<0)
+					idx=i;
+				else
+				{
+					System.out.println("ERROR: multiple cat "+in.charAt(i));
+					System.out.println(in);
+					if(in.charAt(i-1)=='-'&&Character.isAlphabetic(in.charAt(i-2)))
+					{
+						idx=-2;
+					}
+					//System.exit(0);
+				}
+			}
+		}
+		return idx;
+	}
+	
+	public String convert_cat_data_amg(String in)
+	{
+		int idx=-1;
+		for(int i=0;i<in.length();i++)
+		{
+			if(Character.isAlphabetic(in.charAt(i)))
+			{
+				if(idx<0)
+					idx=i;
+				else
+				{
+					System.out.println("Repaing multiple cat");
+					System.out.println(in);
+					if(in.charAt(i-1)=='-'&&Character.isAlphabetic(in.charAt(i-2)))
+					{
+						in=in.substring(0,i-2)+"0"+in.substring(i+1);
+					}
+					//System.exit(0);
+				}
+			}
+		}
+		return in;
+	}
+	
+	public String convert_cat_data(String in,HashMap<Character,Integer> map,int idx)
+	{
+		String out="";
+		if(!map.containsKey(in.charAt(idx)))
+		{
+			System.out.println("ERROR");
+			System.exit(0);
+		}
+		int c=map.get(in.charAt(idx));
+		 out =in.substring(0,idx)+c+in.substring(idx+1);
+		return out;
+	}
+	
 	public void convert_arff_file(ArrayList<String> vertex,String inputfile,String outputfile)
 	{
 		BufferedReader br = null;
@@ -232,19 +323,39 @@ public class master
 			//bw.write("\n@data\n\n");
 			bw.flush();
 			c=0;
+			int cat_count=0;
+			HashMap<Character,Integer> cat_map=new HashMap<Character,Integer>();
 			while((line = br.readLine())!=null)
 			{
 				if(!line.isEmpty()&&!line.contains("data")&&!line.contains("DATA"))
 				{
 					//System.out.println(line+"\n");
-					System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
+					//System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
 					out="";
 					label_vec="";
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
 					String gene_l=part[part.length-1];
 					out=line.substring(0,line.length()-1-gene_l.length());
-					System.out.println(gene_l);
+					int idx=get_index_cat(out);
+					if(idx>=0)
+					{
+						if(cat_map.containsKey(out.charAt(idx)))
+						{
+							out=convert_cat_data(out,cat_map,idx);
+						}
+						else
+						{
+							cat_count++;
+							cat_map.put(out.charAt(idx), cat_count);
+							out=convert_cat_data(out,cat_map,idx);
+						}
+					}
+					if(idx==-2)
+					{
+						out=convert_cat_data_amg(out);
+					}
+					//System.out.println(gene_l);
 					gene=gene_l.replace(".", "").split("@");
 					ArrayList<Double> vec=new ArrayList<Double>();
 					for(String temp : predicted_classes)
@@ -257,9 +368,9 @@ public class master
 					{
 						temp=temp.replaceAll("/",".");
 						boolean fflag=true;
-						System.out.println("Temp> "+gene.length);
+						//System.out.println("Temp> "+gene.length);
 						int y=predicted_classes.indexOf(temp);
-						System.out.println(""+temp);
+						//System.out.println(""+temp);
 						vec.set(predicted_classes.indexOf(temp),new Double(1));
 					}
 					label_vec=",";
@@ -268,7 +379,7 @@ public class master
 					{
 						label_vec+=(int)d+",";
 					}
-					System.out.println("-----------");
+					//System.out.println("-----------");
 					vec.clear();
 					label_vec=label_vec.substring(0,label_vec.length()-1);
 					//System.out.println(label_vec);
@@ -319,19 +430,39 @@ public class master
 			//bw.write("\n@data\n\n");
 			bw.flush();
 			c=0;
+			int cat_count=0;
+			HashMap<Character,Integer> cat_map=new HashMap<Character,Integer>();
 			while((line = br.readLine())!=null)
 			{
 				if(!line.isEmpty()&&!line.contains("data")&&!line.contains("DATA"))
 				{
 					//System.out.println(line+"\n");
-					System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
+					//System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
 					out="";
 					label_vec="";
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
 					String gene_l=part[part.length-1];
 					out=line.substring(0,line.length()-1-gene_l.length());
-					System.out.println(gene_l);
+					int idx=get_index_cat(out);
+					if(idx>=0)
+					{
+						if(cat_map.containsKey(out.charAt(idx)))
+						{
+							out=convert_cat_data(out,cat_map,idx);
+						}
+						else
+						{
+							cat_count++;
+							cat_map.put(out.charAt(idx), cat_count);
+							out=convert_cat_data(out,cat_map,idx);
+						}
+					}
+					if(idx==-2)
+					{
+						out=convert_cat_data_amg(out);
+					}
+					//System.out.println(gene_l);
 					gene=gene_l.replace(".", "").split("@");
 					ArrayList<Double> vec=new ArrayList<Double>();
 					for(String temp : predicted_classes)
@@ -344,9 +475,9 @@ public class master
 					{
 						temp=temp.replaceAll("/",".");
 						boolean fflag=true;
-						System.out.println("Temp> "+gene.length);
+						//System.out.println("Temp> "+gene.length);
 						int y=predicted_classes.indexOf(temp);
-						System.out.println(""+temp);
+						//System.out.println(""+temp);
 						vec.set(predicted_classes.indexOf(temp),new Double(1));
 						//OWLClass t_cls = factory.getOWLClass(IRI.create("http://purl.org/obo/owl/gene_ontology_edit#"+temp));
 						OWLClass t_cls = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+temp));
@@ -367,7 +498,7 @@ public class master
 										int m1=vertex.indexOf(temp);
 										int n1=vertex.indexOf(news);
 										vec.set(predicted_classes.indexOf(news),new Double(1));
-										System.out.println("Super class: "+news+" index: "+predicted_classes.indexOf(news));
+										//System.out.println("Super class: "+news+" index: "+predicted_classes.indexOf(news));
 										fflag=false;
 									}
 								}
@@ -382,7 +513,7 @@ public class master
 					{
 						label_vec+=(int)d+",";
 					}
-					System.out.println("-----------");
+					//System.out.println("-----------");
 					vec.clear();
 					label_vec=label_vec.substring(0,label_vec.length()-1);
 					//System.out.println(label_vec);
@@ -415,22 +546,57 @@ public class master
 		}
 	}
 	
+	public void merge_files(String input1,String input2,String output)
+	{
+		BufferedReader br1 = null;
+		BufferedReader br2 = null;
+		BufferedWriter bw = null;
+		try {
+			br1 = new BufferedReader(new FileReader(input1));
+			br2 = new BufferedReader(new FileReader(input2));
+			bw = new BufferedWriter(new FileWriter(output));
+			String line;
+			boolean flag=true;
+			while((line = br1.readLine())!=null)
+			{
+				bw.write(line+"\n");
+			}
+			br1.close();
+			while((line = br2.readLine())!=null)
+			{
+				bw.write(line+"\n");
+			}
+			br2.close();
+			bw.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void main() throws OWLOntologyCreationException
 	{
 		int limit=2;
 		
-		String ontology_name="cellcycle0";
-		String ontology_file_name="E:/ontologies/cellcycle0_FUN_new.owl";
+		String ontology_name="church";
+		String ontology_file_name="E:/test/church_FUN.owl";
 		String fv_arr_file="E:/test/fv_arr.txt";
-		String train_file="E:/test/cellcycle_FUN.train.arff";
-		String test_file="E:/test/cellcycle_FUN.test.arff";
-		String converted_train_file="E:/test/cellcycle_FUN.train.converted.arff";
-		String converted_test_file="E:/test/cellcycle_FUN.test.converted.arff";
-		String expanded_test_file="E:/test/cellcycle_FUN.test.expanded.arff"; // required to check the results in cssa_ms_new.jav and inde_set_new.java
+		String train_file="E:/test/church_FUN.train.arff";
+		String valid_file="E:/test/church_FUN.valid.arff";
+		String test_file="E:/test/church_FUN.test.arff";
+		String converted_train_file="E:/test/church_FUN.train.converted.arff";
+		String converted_vaild_file="E:/test/church_FUN.valid.converted.arff";
+		String combined_train_file="E:/test/church_FUN.train.combined.arff";
+		String converted_test_file="E:/test/church_FUN.test.converted.arff";
+		String expanded_test_file="E:/test/church_FUN.test.expanded.arff"; // required to check the results in cssa_ms_new.jav and inde_set_new.java
 		String result_file="E:/test/result.txt";
 		String matlab_folder="E:/test";
+		int no_attr=get_number_of_attr(train_file);
+		System.out.println("Number of attr: "+no_attr);
 
-		create_new_ontology("E:/test/cellcycle_FUN.train.arff", ontology_name,ontology_file_name);
+		System.out.println("Creating ontology file");
+		create_new_ontology("E:/test/church_FUN.train.arff", ontology_name,ontology_file_name);
 		manager = OWLManager.createOWLOntologyManager();
 		go = manager.loadOntologyFromOntologyDocument(new File(ontology_file_name));
 		System.out.println("Loaded ontology: " + go.getOntologyID().toString());
@@ -441,15 +607,24 @@ public class master
 		factory = manager.getOWLDataFactory();
 
 		ArrayList<String> vertex=create_vertex_list();
+		/*
+		System.out.println("Creating kernel file");
 		create_fv_arr(fv_arr_file,vertex);
-		convert_arff_file(vertex,train_file,converted_train_file);
+		System.out.println("Creating training file");
+		convert_arff_file_expand(vertex,train_file,converted_train_file);
+		System.out.println("Creating validation file");
+		convert_arff_file_expand(vertex,valid_file,converted_vaild_file);
+		System.out.println("Creating test file");
 		convert_arff_file(vertex,test_file,converted_test_file);
+		System.out.println("Creating merged file");
+		merge_files(converted_train_file,converted_vaild_file,combined_train_file);
+		System.out.println("Creating expanded file");
 		convert_arff_file_expand(vertex,test_file,expanded_test_file);
 
 		//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
 		//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
 
-		String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1='"+fv_arr_file+"';file2='"+converted_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
+		String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(cmd);
@@ -467,19 +642,21 @@ public class master
 				e.printStackTrace();
 			}
 		}
-		
-		cssa cs=new cssa();
-		curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
+		*/
+		/*cssa cs=new cssa();
+		curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
+		output_curve(cssa_curve,"E:/test/curve_cssa.txt");
 		
 		cssa_ms_new cms=new cssa_ms_new();
-		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
+		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
+		output_curve(cssa_ms_curve,"E:/test/curve_cssa_ms.txt");
 		
 		inde_set_new isn=new inde_set_new();
-		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, 2);
+		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,20);
+		output_curve(inde_curve,"E:/test/curve_inde_set.txt");*/
 		
-		output_curve(cssa_curve,"curve_cssa.txt");
-		output_curve(cssa_ms_curve,"curve_cssa_ms.txt");
-		output_curve(inde_curve,"curve_inde_set.txt");
+		cssa_ms_fast cms=new cssa_ms_fast();
+		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 50);
 	}
 
 	public static void main(String[] args)
