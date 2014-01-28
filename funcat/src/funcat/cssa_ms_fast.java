@@ -264,7 +264,7 @@ public class cssa_ms_fast {
 					}
 					System.out.println();*/
 					//System.out.println("K is - "+k);
-					update_pr(k,test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
+					update_pr(selected.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 					if(selected.size()==(vertex.size()-1))
 					{
 						continue main_loop;
