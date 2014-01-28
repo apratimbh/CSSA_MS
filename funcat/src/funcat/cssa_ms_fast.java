@@ -208,14 +208,14 @@ public class cssa_ms_fast {
 								System.out.println(s);
 							}*/
 							//System.out.println("ms-list-size: "+ms_list.size());
-							/*ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(current_sn,null,questionable_supernode_parent);
+							ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(current_sn,null,questionable_supernode_parent);
 							ArrayList<String> all_nodes_in_split=get_all_nodes_in_split(all_supernodes_in_split);
 							double nsnv=new_snv(all_nodes_in_split,vertex,weights);
 							if(nsnv>max_split)
 							{
 								max_split=nsnv;
 								current_best=new Split(all_nodes_in_split,vertex,current_sn.ms_list,parent_ms,weights,all_supernodes_in_split);
-							}*/
+							}
 							continue loop2;
 						}
 						ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(current_sn,sibling,questionable_supernode_parent);

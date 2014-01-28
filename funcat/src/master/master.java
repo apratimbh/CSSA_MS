@@ -334,6 +334,7 @@ public class master
 					//System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
 					out="";
 					label_vec="";
+					
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
 					String gene_l=part[part.length-1];
