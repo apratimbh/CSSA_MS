@@ -64,7 +64,7 @@ public class cssa_ms_fast {
 
 		curve prc=new curve();
 
-		ArrayList<pr_store> pr_store_list=create_pr_store(limit+10);
+		ArrayList<pr_store> pr_store_list=create_pr_store(vertex.size()+1);
 		int prev=0;
 		main_loop: for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 		{
