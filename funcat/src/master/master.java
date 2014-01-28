@@ -334,7 +334,10 @@ public class master
 					//System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
 					out="";
 					label_vec="";
-					
+					if(line.contains("mit"))
+					{
+						line.replaceAll("mit", "17");
+					}
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
 					String gene_l=part[part.length-1];
@@ -442,6 +445,10 @@ public class master
 					//System.out.println("\n--------------------\nTaining example: "+(++c)+"\n-----------------");
 					out="";
 					label_vec="";
+					if(line.contains("mit"))
+					{
+						line.replaceAll("mit", "17");
+					}
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
 					String gene_l=part[part.length-1];
