@@ -40,6 +40,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 import pr_curve.curve;
 import pr_curve.curve_point;
 import funcat.cssa;
+import funcat.cssa_fast;
 import funcat.cssa_ms_fast;
 import funcat.cssa_ms_new;
 import funcat.inde_set_new;
@@ -579,17 +580,17 @@ public class master
 	{
 		int limit=2;
 		
-		String ontology_name="church";
-		String ontology_file_name="E:/test/church_FUN.owl";
+		String ontology_name="cellcycle";
+		String ontology_file_name="E:/test/cellcycle_FUN.owl";
 		String fv_arr_file="E:/test/fv_arr.txt";
-		String train_file="E:/test/church_FUN.train.arff";
-		String valid_file="E:/test/church_FUN.valid.arff";
-		String test_file="E:/test/church_FUN.test.arff";
-		String converted_train_file="E:/test/church_FUN.train.converted.arff";
-		String converted_vaild_file="E:/test/church_FUN.valid.converted.arff";
-		String combined_train_file="E:/test/church_FUN.train.combined.arff";
-		String converted_test_file="E:/test/church_FUN.test.converted.arff";
-		String expanded_test_file="E:/test/church_FUN.test.expanded.arff"; // required to check the results in cssa_ms_new.jav and inde_set_new.java
+		String train_file="E:/test/cellcycle_FUN.train.arff";
+		String valid_file="E:/test/cellcycle_FUN.valid.arff";
+		String test_file="E:/test/cellcycle_FUN.test.arff";
+		String converted_train_file="E:/test/cellcycle_FUN.train.converted.arff";
+		String converted_vaild_file="E:/test/cellcycle_FUN.valid.converted.arff";
+		String combined_train_file="E:/test/cellcycle_FUN.train.combined.arff";
+		String converted_test_file="E:/test/cellcycle_FUN.test.converted.arff";
+		String expanded_test_file="E:/test/cellcycle_FUN.test.expanded.arff"; // required to check the results in cssa_ms_new.jav and inde_set_new.java
 		String result_file="E:/test/result.txt";
 		String matlab_folder="E:/test";
 		int no_attr=get_number_of_attr(train_file);
@@ -607,8 +608,8 @@ public class master
 		factory = manager.getOWLDataFactory();
 
 		ArrayList<String> vertex=create_vertex_list();
-		/*
-		System.out.println("Creating kernel file");
+		
+		/*System.out.println("Creating kernel file");
 		create_fv_arr(fv_arr_file,vertex);
 		System.out.println("Creating training file");
 		convert_arff_file(vertex,train_file,converted_train_file);
@@ -641,22 +642,22 @@ public class master
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
-		*/
-		/*cssa cs=new cssa();
+		}*/
+		
+		cssa_fast cs=new cssa_fast();
 		curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
 		output_curve(cssa_curve,"E:/test/curve_cssa.txt");
 		
-		cssa_ms_new cms=new cssa_ms_new();
+		cssa_ms_fast cms=new cssa_ms_fast();
 		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 		output_curve(cssa_ms_curve,"E:/test/curve_cssa_ms.txt");
 		
-		inde_set_new isn=new inde_set_new();
-		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,20);
+		/*inde_set_new isn=new inde_set_new();
+		curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,70);
 		output_curve(inde_curve,"E:/test/curve_inde_set.txt");*/
 		
-		cssa_ms_fast cms=new cssa_ms_fast();
-		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 50);
+		/*cssa_ms_fast cms=new cssa_ms_fast();
+		curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 50);*/
 	}
 
 	public static void main(String[] args)

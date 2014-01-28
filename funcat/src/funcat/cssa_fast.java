@@ -34,7 +34,7 @@ import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import pr_curve.curve;
 import pr_curve.curve_point;
 
-public class cssa_ms_fast {
+public class cssa_fast {
 	public double[][] result=null,flabels=null,test_data=null;
 	public double[][] pr_val=new double[10][3];
 	OWLOntologyManager manager;
@@ -68,7 +68,6 @@ public class cssa_ms_fast {
 		int prev=0;
 		main_loop: for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 		{
-
 			int curr_done=(int)(((double)test_ex_no/result[0].length)*100);
 			if(curr_done!=prev)
 			{
@@ -104,23 +103,17 @@ public class cssa_ms_fast {
 			{
 				weights[i]=(weights[i]-min)/(max-min);
 			}
-
 			// ----------------------
 			// CSSA
 
 			// list of supernodes (each supernode contains one node and snv is the weight of that node)
 			ArrayList<Supernode> sn_list=create_supernodes(vertex,weights,vertex);
 			// kernel density assigned
-			ArrayList<String> considered=new ArrayList<String>();
-			// questionable nodes
-			ArrayList<Supernode> questionable=new ArrayList<Supernode>();
+			ArrayList<Supernode> assigned=new ArrayList<Supernode>();
+			// kernel density value
+			HashMap<Supernode,Double> allocated_density=new HashMap<Supernode,Double>();
 			// selected nodes
 			ArrayList<String> selected=new ArrayList<String>();
-			// selected ms nodes
-			ArrayList<String> ms_list=new ArrayList<String>();
-			// questionable node- parent map
-			HashMap<Supernode,Supernode> questionable_supernode_parent=new HashMap<Supernode,Supernode>();
-			HashMap<Supernode,String> questionable_ms_parent=new HashMap<Supernode,String>();
 
 			// -------------
 
@@ -128,16 +121,14 @@ public class cssa_ms_fast {
 
 			int k=0;
 			// k1 keeps track of the number of ms labels (nodes) selected so far
-			while(!all_nodes_considered(vertex,considered))
+			while(k<limit)
 			{	
-
 				// ----- select supernode with max snv
 				Supernode selected_sn=sn_list.get(0);
 				int selected_sn_idx=0;
 				double max_snv=sn_list.get(0).snv;
 				// selected_sn is the supernode with the highest snv
-				//System.out.println("Supernode list length: "+sn_list.size()+" Questionale length: "+questionable.size());
-				//System.out.println("Stuck!");
+
 				for(Supernode tmp : sn_list)
 				{
 					if(tmp.snv>max_snv)
@@ -147,21 +138,21 @@ public class cssa_ms_fast {
 						max_snv=tmp.snv;
 					}
 				}
-				// add all supernodes to the questionable list
-				if(all_parents_considered(considered,selected_sn.parents_list))
+				if(all_parents_selected(selected,selected_sn.parents_list))
 				{
-					/*String parent_ms=child_of_ms(selected_sn,ms_list);
-						// if child of a previously selected ms node
-						questionable_node_parent.put(selected_sn, parent_ms);*/
-					Supernode parent=find_parent_supernode(questionable,selected_sn);
-					if(parent!=null)
-						questionable_supernode_parent.put(selected_sn, parent);
 					sn_list.remove(selected_sn);
-					questionable.add(selected_sn);
-					for(String s : selected_sn.nodes)
+					assigned.add(selected_sn);
+					allocated_density.put(selected_sn, (double)(limit-k)/selected_sn.size);
+					k+=selected_sn.size;
+					// add nodes to the selected list
+					for(String tmp : selected_sn.nodes)
 					{
-						considered.add(s);
+						if(!selected.contains(tmp))
+						{
+							selected.add(tmp);
+						}
 					}
+					update_pr(k,test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 				}
 				else
 				{
@@ -171,119 +162,9 @@ public class cssa_ms_fast {
 					sn_list.remove(selected_sn);
 					sn_list.add(merged);
 				}
-			}
-			/*	System.out.println("Supernodes: ms-list");
-				for(Supernode s: questionable)
-				{
-					s.print();
-					if(questionable_supernode_parent.containsKey(s))
-					{
-						System.out.println("map: Parent-- ");
-						questionable_supernode_parent.get(s).print();
-					}
 
-				}
-				System.exit(0);*/
-			k=0;
-			loop1: while(k<limit)
-			{
-				Split current_best=null;
-				double max_split=0;
-				loop2: for(Supernode current_sn : questionable)
-				{
-					String parent_ms=child_of_ms(current_sn,ms_list);
-					/*current_sn.print();
-					System.out.println("Ms - Parent -- "+parent_ms);*/
-					if(parent_ms!=null&&current_sn.ms_list.size()==1)
-					{
-						questionable_ms_parent.put(current_sn, parent_ms);
-						Supernode sibling=search_siblings(current_sn,ms_list,questionable,questionable_supernode_parent,vertex,weights);
-						if(sibling==null)
-						{
-							/*System.out.println("Not found -- parent -- ms "+parent_ms);
-							current_sn.print();
-							System.out.println("ms-list> ");
-							for(String s: ms_list)
-							{
-								System.out.println(s);
-							}*/
-							//System.out.println("ms-list-size: "+ms_list.size());
-							/*ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(current_sn,null,questionable_supernode_parent);
-							ArrayList<String> all_nodes_in_split=get_all_nodes_in_split(all_supernodes_in_split);
-							double nsnv=new_snv(all_nodes_in_split,vertex,weights);
-							if(nsnv>max_split)
-							{
-								max_split=nsnv;
-								current_best=new Split(all_nodes_in_split,vertex,current_sn.ms_list,parent_ms,weights,all_supernodes_in_split);
-							}*/
-							continue loop2;
-						}
-						ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(current_sn,sibling,questionable_supernode_parent);
-						ArrayList<String> all_nodes_in_split=get_all_nodes_in_split(all_supernodes_in_split);
-						double nsnv=new_snv(all_nodes_in_split,vertex,weights);
-						if(nsnv>max_split)
-						{
-							max_split=nsnv;
-							ArrayList<String> new_ms_list=get_new_ms_nodes(current_sn.ms_list,sibling.ms_list);
-							current_best=new Split(all_nodes_in_split,vertex,new_ms_list,parent_ms,weights,all_supernodes_in_split);
-						}
-					}
-					else
-					{
-						ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(current_sn,null,questionable_supernode_parent);
-						ArrayList<String> all_nodes_in_split=get_all_nodes_in_split(all_supernodes_in_split);
-						double nsnv=new_snv(all_nodes_in_split,vertex,weights);
-						if(nsnv>max_split)
-						{
-							max_split=nsnv;
-							current_best=new Split(all_nodes_in_split,vertex,current_sn.ms_list,parent_ms,weights,all_supernodes_in_split);
-						}
-					}
-				}
-				if(current_best!=null)
-				{
-					for(String node: current_best.nodes)
-					{
-						if(!selected.contains(node))
-							selected.add(node);
-					}
-					if(current_best.parent!=null&&ms_list.contains(current_best.parent))
-					{
-						ms_list.remove(current_best.parent);
-						k--;
-					}
-					for(String ms: current_best.ms)
-					{
-						ms_list.add(ms);
-						k++;
-					}
-					/*System.out.println("ms-nodes: ");
-					for(String ms: ms_list)
-					{
-						System.out.print(ms+" , ");
-					}
-					System.out.println();*/
-					//System.out.println("K is - "+k);
-					update_pr(k,test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
-					if(selected.size()==(vertex.size()-1))
-					{
-						continue main_loop;
-					}
-					for(Supernode sn: current_best.cointained_supernodes)
-					{
-						questionable.remove(sn);
-					}
-				}
-				else
-				{
-					break loop1;
-				}
-			}
-			//System.exit(0);
-
-
-		} // --for loop end // all examples
-
+			} // --for loop end // all examples
+		}
 		for(int k=0;k<pr_store_list.size();k++)
 		{
 			//pr_store_list.get(k).tp-=result[0].length;
@@ -604,6 +485,22 @@ public class cssa_ms_fast {
 	{
 		if(parents.size()>2)
 			System.out.println("Number of parents: "+parents.size());
+		if(parents.size()!=0)
+		{
+			for(String parent: parents)
+			{
+				if(!selected.contains(parent))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+
+	}
+
+	public boolean all_parents_selected(ArrayList<String> selected,ArrayList<String> parents)
+	{
 		if(parents.size()!=0)
 		{
 			for(String parent: parents)
