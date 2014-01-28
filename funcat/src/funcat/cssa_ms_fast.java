@@ -469,7 +469,7 @@ public class cssa_ms_fast {
 			{
 				ArrayList<Supernode> all_supernodes_in_split=get_all_supernodes_in_split(s,sn,map);
 				ArrayList<String> all_nodes_in_split=get_all_nodes_in_split(all_supernodes_in_split);
-				double nsnv=new_snv(all_nodes_in_split,vertex,weights);
+				double nsnv=(double)new_snv(all_nodes_in_split,vertex,weights)/all_nodes_in_split.size();
 				if(nsnv>max_snv)
 				{
 					max_snv=nsnv;
