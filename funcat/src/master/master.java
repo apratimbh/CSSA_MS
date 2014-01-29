@@ -39,6 +39,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 import pr_curve.curve;
 import pr_curve.curve_point;
+import funcat.aims;
 import funcat.cssa;
 import funcat.cssa_fast;
 import funcat.cssa_ms_fast;
@@ -587,7 +588,7 @@ public class master
 	public void main() throws OWLOntologyCreationException
 	{
 		int limit=2;
-		String[] onto_names={"eisen","expr","gasch1","gasch2","hom","pheno","seq","spo","struc"};
+		String[] onto_names={"cellcycle"/*,"eisen","expr","gasch1","gasch2","hom","pheno","seq","spo","struc"*/};
 		String matlab_folder="E:/test";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -596,7 +597,7 @@ public class master
 			String fv_arr_file=matlab_folder+"/fv_arr_"+onto_names[i]+".txt";
 			String train_file=matlab_folder+"/"+onto_names[i]+"_FUN.train.arff";
 			String valid_file=matlab_folder+"/"+onto_names[i]+"_FUN.valid.arff";
-			String test_file=matlab_folder+"/"+onto_names[i]+".test.arff";
+			String test_file=matlab_folder+"/"+onto_names[i]+"_FUN.test.arff";
 			String converted_train_file=matlab_folder+"/"+onto_names[i]+"_FUN.train.converted.arff";
 			String converted_vaild_file=matlab_folder+"/"+onto_names[i]+"_FUN.valid.converted.arff";
 			String combined_train_file=matlab_folder+"/"+onto_names[i]+"_FUN.train.combined.arff";
@@ -653,8 +654,22 @@ public class master
 					e.printStackTrace();
 				}
 			}
-
+			
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			cssa_fast cs=new cssa_fast();
+			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
+			output_curve(cssa_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa.txt");
+			
+			aims am=new aims();
+			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
+			output_curve(am_curve,matlab_folder+"/"+onto_names[i]+"_curve_aims.txt");
+
+			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
 			output_curve(cssa_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa.txt");
 
@@ -664,7 +679,7 @@ public class master
 
 			inde_set_new isn=new inde_set_new();
 			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,70);
-			output_curve(inde_curve,matlab_folder+"/"+onto_names[i]+"_curve_inde_set.txt");
+			output_curve(inde_curve,matlab_folder+"/"+onto_names[i]+"_curve_inde_set.txt");*/
 		}
 
 		/*cssa_ms_fast cms=new cssa_ms_fast();

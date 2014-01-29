@@ -8,6 +8,7 @@ public class Split {
 	ArrayList<Supernode> cointained_supernodes=new ArrayList<Supernode>();
 	String parent="";
 	double snv=0;
+	double new_curr_best=0;
 	public Split(Supernode node1,Supernode node2)
 	{
 		this.parent=node1.parent;
@@ -48,6 +49,22 @@ public class Split {
 			this.cointained_supernodes.add(sn);
 		}
 		this.snv=(double)avg/nodes.size();
+	}
+	public Split(ArrayList<String> nodes,ArrayList<String> ms_list,String parent_ms,double new_curr_best)
+	{
+		// here parent is the ms node the split is a child of
+		if(parent_ms!=null)
+			this.parent=parent_ms;
+		double avg=0;
+		for(String tmp : nodes)
+		{
+			this.nodes.add(tmp);
+		}
+		for(String tmp : ms_list)
+		{
+			this.ms.add(tmp);
+		}
+		this.new_curr_best=new_curr_best;
 	}
 }
 class pr {
