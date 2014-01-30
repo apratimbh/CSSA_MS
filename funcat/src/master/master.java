@@ -588,11 +588,12 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		int limit=2;
-		String[] onto_names={"cellcycle"/*,"eisen","expr","gasch1","gasch2","hom","pheno","seq","spo","struc"*/};
-		String matlab_folder="E:/test";
+		String[] onto_names={"church","eisen","expr","hom","pheno","seq","spo","struc"};
+		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
+			System.out.println("Computing; "+onto_names[i]);
+			String matlab_file1=matlab_folder+onto_names[i];
 			String ontology_name=onto_names[i];
 			String ontology_file_name=matlab_folder+"/"+onto_names[i]+"_FUN.owl";
 			String fv_arr_file=matlab_folder+"/fv_arr_"+onto_names[i]+".txt";
@@ -621,7 +622,7 @@ public class master
 
 			ArrayList<String> vertex=create_vertex_list();
 
-			/*System.out.println("Creating kernel file");
+			System.out.println("Creating kernel file");
 			create_fv_arr(fv_arr_file,vertex);
 			System.out.println("Creating training file");
 			convert_arff_file(vertex,train_file,converted_train_file);
@@ -662,25 +663,25 @@ public class master
 				e.printStackTrace();
 			}
 			
-			cssa_fast cs=new cssa_fast();
+			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
-			output_curve(cssa_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa.txt");*/
+			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 			
 			aims_fast am=new aims_fast();
 			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
-			output_curve(am_curve,matlab_folder+"/"+onto_names[i]+"_curve_aims_fast.txt");
+			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_fast.txt");
 
 			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
-			output_curve(cssa_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa.txt");
+			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 
 			cssa_ms_fast cms=new cssa_ms_fast();
 			curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
-			output_curve(cssa_ms_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa_ms.txt");
+			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");
 
 			inde_set_new isn=new inde_set_new();
 			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,70);
-			output_curve(inde_curve,matlab_folder+"/"+onto_names[i]+"_curve_inde_set.txt");*/
+			output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_set.txt");*/
 		}
 
 		/*cssa_ms_fast cms=new cssa_ms_fast();
