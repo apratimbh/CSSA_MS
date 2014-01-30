@@ -593,24 +593,24 @@ public class master
 		for(int i=0;i<onto_names.length;i++)
 		{
 			System.out.println("Computing; "+onto_names[i]);
-			String matlab_file1=matlab_folder+onto_names[i];
+			String matlab_folder1=matlab_folder+onto_names[i];
 			String ontology_name=onto_names[i];
-			String ontology_file_name=matlab_folder+"/"+onto_names[i]+"_FUN.owl";
-			String fv_arr_file=matlab_folder+"/fv_arr_"+onto_names[i]+".txt";
-			String train_file=matlab_folder+"/"+onto_names[i]+"_FUN.train.arff";
-			String valid_file=matlab_folder+"/"+onto_names[i]+"_FUN.valid.arff";
-			String test_file=matlab_folder+"/"+onto_names[i]+"_FUN.test.arff";
-			String converted_train_file=matlab_folder+"/"+onto_names[i]+"_FUN.train.converted.arff";
-			String converted_vaild_file=matlab_folder+"/"+onto_names[i]+"_FUN.valid.converted.arff";
-			String combined_train_file=matlab_folder+"/"+onto_names[i]+"_FUN.train.combined.arff";
-			String converted_test_file=matlab_folder+"/"+onto_names[i]+"_FUN.test.converted.arff";
-			String expanded_test_file=matlab_folder+"/"+onto_names[i]+"_FUN.test.expanded.arff"; // required to check the results in cssa_ms_new.jav and inde_set_new.java
-			String result_file=matlab_folder+"/result_"+onto_names[i]+".txt";
+			String ontology_file_name=matlab_folder1+"/"+onto_names[i]+"_FUN.owl";
+			String fv_arr_file=matlab_folder1+"/fv_arr_"+onto_names[i]+".txt";
+			String train_file=matlab_folder1+"/"+onto_names[i]+"_FUN.train.arff";
+			String valid_file=matlab_folder1+"/"+onto_names[i]+"_FUN.valid.arff";
+			String test_file=matlab_folder1+"/"+onto_names[i]+"_FUN.test.arff";
+			String converted_train_file=matlab_folder1+"/"+onto_names[i]+"_FUN.train.converted.arff";
+			String converted_vaild_file=matlab_folder1+"/"+onto_names[i]+"_FUN.valid.converted.arff";
+			String combined_train_file=matlab_folder1+"/"+onto_names[i]+"_FUN.train.combined.arff";
+			String converted_test_file=matlab_folder1+"/"+onto_names[i]+"_FUN.test.converted.arff";
+			String expanded_test_file=matlab_folder1+"/"+onto_names[i]+"_FUN.test.expanded.arff"; // required to check the results in cssa_ms_new.jav and inde_set_new.java
+			String result_file=matlab_folder1+"/result_"+onto_names[i]+".txt";
 			int no_attr=get_number_of_attr(train_file);
 			System.out.println("Number of attr: "+no_attr);
 
 			System.out.println("Creating ontology file");
-			create_new_ontology(matlab_folder+"/"+onto_names[i]+"_FUN.train.arff", ontology_name,ontology_file_name);
+			create_new_ontology(matlab_folder1+"/"+onto_names[i]+"_FUN.train.arff", ontology_name,ontology_file_name);
 			manager = OWLManager.createOWLOntologyManager();
 			go = manager.loadOntologyFromOntologyDocument(new File(ontology_file_name));
 			System.out.println("Loaded ontology: " + go.getOntologyID().toString());
