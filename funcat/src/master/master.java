@@ -290,7 +290,7 @@ public class master
 		return out;
 	}
 
-	public void convert_arff_file(ArrayList<String> vertex,String inputfile,String outputfile)
+	public void convert_arff_file(ArrayList<String> vertex,String inputfile,String outputfile,String onto_name)
 	{
 		BufferedReader br = null;
 		BufferedWriter bw = null;
@@ -328,6 +328,8 @@ public class master
 			c=0;
 			int cat_count=0;
 			HashMap<Character,Integer> cat_map=new HashMap<Character,Integer>();
+			boolean flag1=onto_name.contains("expr")||onto_name.contains("spo");
+			boolean flag2=onto_name.contains("pheno");
 			while((line = br.readLine())!=null)
 			{
 				if(!line.isEmpty()&&!line.contains("data")&&!line.contains("DATA"))
@@ -338,7 +340,19 @@ public class master
 					label_vec="";
 					if(line.contains("mit"))
 					{
-						line.replaceAll("mit", "17");
+						line=line.replaceAll("mit", "17");
+					}
+					if(flag1)
+					{
+						line=line.replaceAll("no", "0");
+						line=line.replaceAll("yes", "0");
+					}
+					if(flag2)
+					{
+						line=line.replaceAll("w", "1");
+						line=line.replaceAll("n", "2");
+						line=line.replaceAll("s", "3");
+						line=line.replaceAll("r", "4");
 					}
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
@@ -401,7 +415,7 @@ public class master
 		}
 	}
 
-	public void convert_arff_file_expand(ArrayList<String> vertex,String inputfile,String outputfile)
+	public void convert_arff_file_expand(ArrayList<String> vertex,String inputfile,String outputfile,String onto_name)
 	{
 		BufferedReader br = null;
 		BufferedWriter bw = null;
@@ -438,6 +452,8 @@ public class master
 			bw.flush();
 			c=0;
 			int cat_count=0;
+			boolean flag1=onto_name.contains("expr")||onto_name.contains("spo");
+			boolean flag2=onto_name.contains("pheno");
 			HashMap<Character,Integer> cat_map=new HashMap<Character,Integer>();
 			while((line = br.readLine())!=null)
 			{
@@ -449,7 +465,19 @@ public class master
 					label_vec="";
 					if(line.contains("mit"))
 					{
-						line.replaceAll("mit", "17");
+						line=line.replaceAll("mit", "17");
+					}
+					if(flag1)
+					{
+						line=line.replaceAll("no", "0");
+						line=line.replaceAll("yes", "1");
+					}
+					if(flag2)
+					{
+						line=line.replaceAll("w", "1");
+						line=line.replaceAll("n", "2");
+						line=line.replaceAll("s", "3");
+						line=line.replaceAll("r", "4");
 					}
 					line=line.replaceAll("\\?", "-99999999");
 					String[] part=line.split(",");
@@ -588,13 +616,13 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"church","eisen","expr","hom","pheno","seq","spo","struc"};
+		String[] onto_names={"pheno","seq","spo","struc"};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
 			System.out.println("Computing; "+onto_names[i]);
 			String matlab_folder1=matlab_folder+onto_names[i];
-			String ontology_name=onto_names[i];
+			String ontology_name=onto_names[i]; 
 			String ontology_file_name=matlab_folder1+"/"+onto_names[i]+"_FUN.owl";
 			String fv_arr_file=matlab_folder1+"/fv_arr_"+onto_names[i]+".txt";
 			String train_file=matlab_folder1+"/"+onto_names[i]+"_FUN.train.arff";
@@ -625,15 +653,15 @@ public class master
 			System.out.println("Creating kernel file");
 			create_fv_arr(fv_arr_file,vertex);
 			System.out.println("Creating training file");
-			convert_arff_file(vertex,train_file,converted_train_file);
+			convert_arff_file(vertex,train_file,converted_train_file,onto_names[i]);
 			System.out.println("Creating validation file");
-			convert_arff_file(vertex,valid_file,converted_vaild_file);
+			convert_arff_file(vertex,valid_file,converted_vaild_file,onto_names[i]);
 			System.out.println("Creating test file");
-			convert_arff_file(vertex,test_file,converted_test_file);
+			convert_arff_file(vertex,test_file,converted_test_file,onto_names[i]);
 			System.out.println("Creating merged file");
 			merge_files(converted_train_file,converted_vaild_file,combined_train_file);
 			System.out.println("Creating expanded file");
-			convert_arff_file_expand(vertex,test_file,expanded_test_file);
+			convert_arff_file_expand(vertex,test_file,expanded_test_file,onto_names[i]);
 
 			//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
 			//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
