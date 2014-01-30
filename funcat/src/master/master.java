@@ -40,6 +40,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 import pr_curve.curve;
 import pr_curve.curve_point;
 import funcat.aims;
+import funcat.aims_fast;
 import funcat.cssa;
 import funcat.cssa_fast;
 import funcat.cssa_ms_fast;
@@ -620,7 +621,7 @@ public class master
 
 			ArrayList<String> vertex=create_vertex_list();
 
-			System.out.println("Creating kernel file");
+			/*System.out.println("Creating kernel file");
 			create_fv_arr(fv_arr_file,vertex);
 			System.out.println("Creating training file");
 			convert_arff_file(vertex,train_file,converted_train_file);
@@ -663,11 +664,11 @@ public class master
 			
 			cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
-			output_curve(cssa_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa.txt");
+			output_curve(cssa_curve,matlab_folder+"/"+onto_names[i]+"_curve_cssa.txt");*/
 			
-			aims am=new aims();
+			aims_fast am=new aims_fast();
 			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
-			output_curve(am_curve,matlab_folder+"/"+onto_names[i]+"_curve_aims.txt");
+			output_curve(am_curve,matlab_folder+"/"+onto_names[i]+"_curve_aims_fast.txt");
 
 			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
