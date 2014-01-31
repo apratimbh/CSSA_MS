@@ -118,10 +118,10 @@ public class cssa_fast {
 			// -------------
 
 			// ------ CSSA
-
+			//System.out.println("Supernode size: "+sn_list.size());
 			int k=0;
 			// k1 keeps track of the number of ms labels (nodes) selected so far
-			while(k<limit)
+			while(k<limit&&sn_list.size()>0)
 			{	
 				// ----- select supernode with max snv
 				Supernode selected_sn=sn_list.get(0);

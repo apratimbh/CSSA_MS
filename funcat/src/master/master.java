@@ -41,10 +41,12 @@ import pr_curve.curve;
 import pr_curve.curve_point;
 import funcat.aims;
 import funcat.aims_fast;
+import funcat.aims_faster;
 import funcat.cssa;
 import funcat.cssa_fast;
 import funcat.cssa_ms_fast;
 import funcat.cssa_ms_new;
+import funcat.inde_set_fast;
 import funcat.inde_set_new;
 
 public class master 
@@ -616,7 +618,7 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"pheno","seq","spo","struc"};
+		String[] onto_names={"cellcycle","derisi","pheno","eisen"};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -650,54 +652,57 @@ public class master
 
 			ArrayList<String> vertex=create_vertex_list();
 
-			System.out.println("Creating kernel file");
-			create_fv_arr(fv_arr_file,vertex);
-			System.out.println("Creating training file");
-			convert_arff_file(vertex,train_file,converted_train_file,onto_names[i]);
-			System.out.println("Creating validation file");
-			convert_arff_file(vertex,valid_file,converted_vaild_file,onto_names[i]);
-			System.out.println("Creating test file");
-			convert_arff_file(vertex,test_file,converted_test_file,onto_names[i]);
-			System.out.println("Creating merged file");
-			merge_files(converted_train_file,converted_vaild_file,combined_train_file);
-			System.out.println("Creating expanded file");
-			convert_arff_file_expand(vertex,test_file,expanded_test_file,onto_names[i]);
-
-			//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
-			//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
-
-			String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
-			Process p;
-			try {
-				p = Runtime.getRuntime().exec(cmd);
-				p.waitFor();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
 			File result=new File(result_file);
-			while(!result.exists())
+			if(!result.exists())
 			{
+				System.out.println("Creating kernel file");
+				create_fv_arr(fv_arr_file,vertex);
+				System.out.println("Creating training file");
+				convert_arff_file(vertex,train_file,converted_train_file,onto_names[i]);
+				System.out.println("Creating validation file");
+				convert_arff_file(vertex,valid_file,converted_vaild_file,onto_names[i]);
+				System.out.println("Creating test file");
+				convert_arff_file(vertex,test_file,converted_test_file,onto_names[i]);
+				System.out.println("Creating merged file");
+				merge_files(converted_train_file,converted_vaild_file,combined_train_file);
+				System.out.println("Creating expanded file");
+				convert_arff_file_expand(vertex,test_file,expanded_test_file,onto_names[i]);
+
+				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
+				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
+
+				String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
+				Process p;
 				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
+					p = Runtime.getRuntime().exec(cmd);
+					p.waitFor();
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
+
+				File result1=new File(result_file);
+				while(!result1.exists())
+				{
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
-			/*cssa_fast cs=new cssa_fast();
-			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
+			/*
+			cssa_fast cs=new cssa_fast();
+			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,150);
 			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
-			
-			aims_fast am=new aims_fast();
-			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
-			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_fast.txt");
+
+			aims_faster am=new aims_faster();
+			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 50);
+			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_faster.txt");
 
 			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
@@ -705,11 +710,11 @@ public class master
 
 			cssa_ms_fast cms=new cssa_ms_fast();
 			curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
-			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");
+			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");*/
 
-			inde_set_new isn=new inde_set_new();
-			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,70);
-			output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_set.txt");*/
+			inde_set_fast isn=new inde_set_fast();
+			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,400);
+			output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast.txt");
 		}
 
 		/*cssa_ms_fast cms=new cssa_ms_fast();
