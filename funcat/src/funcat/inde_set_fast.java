@@ -302,7 +302,8 @@ public class inde_set_fast {
 					}
 					for(String s : parents)
 					{
-						selected.add(s);
+						if(!selected.contains(s))
+							selected.add(s);
 					}
 					update_pr(selected.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 				}

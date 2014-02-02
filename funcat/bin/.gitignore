@@ -1,12 +1,12 @@
 /FordFulkerson
 /file_create
-/edge.class
-/fld_wrshl.class
 /funcat
-/fv_arr.class
-/inde_set.class
 /master
 /max_cut
+/edge.class
+/fld_wrshl.class
+/fv_arr.class
+/inde_set.class
 /my_data
 /myue_data.class
 /pr_curve
