@@ -276,7 +276,7 @@ public class inde_set_fast {
 				}
 				if(selected.size()<limit)
 				{
-					num++;
+					num+=1+(num/20);
 					//num+=1+(num/5);
 				}
 				else 

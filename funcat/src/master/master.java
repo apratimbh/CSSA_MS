@@ -42,6 +42,8 @@ import pr_curve.curve_point;
 import funcat.aims;
 import funcat.aims_fast;
 import funcat.aims_faster;
+import funcat.aims_ms;
+import funcat.aims_selected;
 import funcat.cssa;
 import funcat.cssa2;
 import funcat.cssa_fast;
@@ -697,7 +699,20 @@ public class master
 				e.printStackTrace();
 			}
 			
-			File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
+			
+			aims_ms am=new aims_ms();
+			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
+			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_ms.txt");
+			
+			aims_selected ams=new aims_selected();
+			am_curve=ams.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
+			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_selected.txt");
+			
+			inde_set_fast isn=new inde_set_fast();
+			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
+			output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
+			
+			/*File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
 			if(!file4.exists())
 			{
 				cssa2 cs=new cssa2();
@@ -712,19 +727,19 @@ public class master
 				curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
 				output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 			}
-			/*aims_faster am=new aims_faster();
+			aims_faster am=new aims_faster();
 			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_faster_ms.txt");
 
-			/*cssa_fast cs=new cssa_fast();
+			cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 500);
 			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 
 			cssa_ms_fast cms=new cssa_ms_fast();
 			curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
-			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");*/
+			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");
 			
-			/*File file3=new File(matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
+			File file3=new File(matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
 			if(!file3.exists())
 			{
 				inde_set_fast isn=new inde_set_fast();
