@@ -3,6 +3,10 @@ package results;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.LineNumberReader;
+import java.util.ArrayList;
+
+import funcat.pr_store;
+import pr_curve.curve_point;
 
 public class get_results {
 	
@@ -10,6 +14,23 @@ public class get_results {
 	{
 		double[][] cssa=read_file("");
 		double[][] aims=read_file("");
+		ArrayList<pr_store> pr_store_list=create_pr_store(cssa.length);
+		for(int i=0;i<cssa.length;i++)
+		{
+			curve_point pt=new curve_point(0,0);
+		}
+		
+	}
+	
+	public ArrayList<pr_store> create_pr_store(int num)
+	{
+		ArrayList<pr_store> pr_store_list=new ArrayList<pr_store>();
+		for(int i=1;i<=num;i++)
+		{
+			pr_store tmp=new pr_store(i);
+			pr_store_list.add(tmp);
+		}
+		return pr_store_list;
 	}
 	
 	public double[][] read_file(String file)

@@ -50,7 +50,9 @@ import funcat.cssa_fast;
 import funcat.cssa_ms_fast;
 import funcat.cssa_ms_new;
 import funcat.inde_set_fast;
+import funcat.inde_set_ms;
 import funcat.inde_set_new;
+import funcat.inde_set_selected;
 
 public class master 
 {
@@ -708,9 +710,13 @@ public class master
 			am_curve=ams.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_selected.txt");
 			
-			inde_set_fast isn=new inde_set_fast();
-			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
-			output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
+			inde_set_ms isms=new inde_set_ms();
+			curve inde_curve_ms=isms.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
+			output_curve(inde_curve_ms,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_ms.txt");
+			
+			inde_set_selected issl=new inde_set_selected();
+			curve inde_curve_sl=issl.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
+			output_curve(inde_curve_sl,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_selected.txt");
 			
 			/*File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
 			if(!file4.exists())
