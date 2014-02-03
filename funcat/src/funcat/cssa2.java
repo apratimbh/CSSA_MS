@@ -182,7 +182,24 @@ public class cssa2 {
 						}
 					}
 					ArrayList<String> new_ms=new_ms(new_selected);
+					/*System.out.println("new selected");
+					for(String s: new_selected)
+					{
+						System.out.println(s);
+					}
+					System.out.println("new ms");
+					for(String s: new_ms)
+					{
+						System.out.println(s);
+					}*/
+					
 					update_ms(ms_nodes,new_ms);
+					/*System.out.println("update ms");
+					for(String s: ms_nodes)
+					{
+						System.out.println(s);
+					}
+					System.exit(0);*/
 					update_pr(ms_nodes.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 				}
 				else
@@ -193,8 +210,9 @@ public class cssa2 {
 					sn_list.remove(selected_sn);
 					sn_list.add(merged);
 				}
-
+				
 			} // --for loop end // all examples
+			//System.exit(0);
 		}
 		for(int k=0;k<pr_store_list.size();k++)
 		{
@@ -210,18 +228,25 @@ public class cssa2 {
 	
 	public void update_ms(ArrayList<String> ms_list,ArrayList<String> new_ms)
 	{
+		for(String s: new_ms)
+		{
+			ms_list.add(s);
+		}
 		ArrayList<String> to_add=new ArrayList<String>();
 		ArrayList<String> to_remove=new ArrayList<String>();
-		for(String ms :ms_list)
+		for(String nms :new_ms)
 		{
-			int m=vertex_index.get(ms);
-			for(String nms:new_ms)
+			int n=vertex_index.get(nms);
+			for(String ms:ms_list)
 			{
-				int n=vertex_index.get(nms);
+				int m=vertex_index.get(ms);
 				if(sub_class_arr[m][n]==1)
 				{
-					to_add.add(nms);
 					to_remove.add(ms);
+				}
+				else if(sub_class_arr[n][m]==1)
+				{
+					to_remove.add(nms);
 				}
 			}
 		}

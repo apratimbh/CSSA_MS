@@ -619,7 +619,7 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"cellcycle",/*"gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
+		String[] onto_names={"gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -697,6 +697,14 @@ public class master
 				e.printStackTrace();
 			}
 			
+			File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
+			if(!file4.exists())
+			{
+				cssa2 cs=new cssa2();
+				curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
+				output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
+			}
+			
 			File file2=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 			if(!file2.exists())
 			{
@@ -716,21 +724,15 @@ public class master
 			curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");*/
 			
-			File file3=new File(matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
+			/*File file3=new File(matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
 			if(!file3.exists())
 			{
 				inde_set_fast isn=new inde_set_fast();
 				curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,70);
 				output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
-			}
+			}*/
 			
-			File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
-			if(!file4.exists())
-			{
-				cssa2 cs=new cssa2();
-				curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
-				output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
-			}
+			
 		}
 
 		/*cssa_ms_fast cms=new cssa_ms_fast();
