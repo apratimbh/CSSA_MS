@@ -618,7 +618,7 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"cellcycle","church","eisen","expr","pheno","derisi","pheno","eisen"};
+		String[] onto_names={"gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -695,12 +695,15 @@ public class master
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			/*
-			cssa_fast cs=new cssa_fast();
-			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,150);
-			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");*/
-
-			aims_faster am=new aims_faster();
+			
+			File file2=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
+			if(!file2.exists())
+			{
+				cssa_fast cs=new cssa_fast();
+				curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
+				output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
+			}
+			/*aims_faster am=new aims_faster();
 			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_faster_ms.txt");
 
@@ -711,10 +714,14 @@ public class master
 			cssa_ms_fast cms=new cssa_ms_fast();
 			curve cssa_ms_curve=cms.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(cssa_ms_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_ms.txt");*/
-
-			/*inde_set_fast isn=new inde_set_fast();
-			curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,400);
-			output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast.txt");*/
+			
+			File file3=new File(matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
+			if(!file3.exists())
+			{
+				inde_set_fast isn=new inde_set_fast();
+				curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,50);
+				output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
+			}
 		}
 
 		/*cssa_ms_fast cms=new cssa_ms_fast();

@@ -126,6 +126,7 @@ public class inde_set_fast {
 			//System.out.println("\n\nexample no: "+test_ex_no+" current: "+current);
 			main_loop: while(true)
 			{
+				selected.clear();
 				ArrayList<String> nvertex=get_vertex(vertex,weights,num);
 				/*System.out.println("Selected nodes: ");
 					for(String s: nvertex)
@@ -299,11 +300,6 @@ public class inde_set_fast {
 									parents.add(part[1]);
 							}
 						}
-					}
-					for(String s : parents)
-					{
-						if(!selected.contains(s))
-							selected.add(s);
 					}
 					update_pr(selected.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 				}

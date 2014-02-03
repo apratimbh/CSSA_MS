@@ -1,14 +1,3 @@
-/FordFulkerson
-/file_create
-/funcat
+/.gitignore
 /master
-/max_cut
-/edge.class
-/fld_wrshl.class
-/fv_arr.class
-/inde_set.class
-/my_data
-/myue_data.class
-/pr_curve
-/vertex.class
-/weka_test.class
+/funcat
