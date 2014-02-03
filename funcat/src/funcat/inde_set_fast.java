@@ -122,12 +122,12 @@ public class inde_set_fast {
 			// list of all nodes with weights above current
 			selected=new ArrayList<String>();
 			int k=0;
-			int num=1;
+			double num=1;
 			//System.out.println("\n\nexample no: "+test_ex_no+" current: "+current);
 			main_loop: while(true)
 			{
 				selected.clear();
-				ArrayList<String> nvertex=get_vertex(vertex,weights,num);
+				ArrayList<String> nvertex=get_vertex(vertex,weights,(int)num);
 				/*System.out.println("Selected nodes: ");
 					for(String s: nvertex)
 					{
@@ -276,7 +276,7 @@ public class inde_set_fast {
 				}
 				if(selected.size()<limit)
 				{
-					num++;
+					num+=1+(num/5);
 				}
 				else 
 				{

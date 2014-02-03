@@ -74,7 +74,7 @@ public class cssa_fast {
 				System.out.println(curr_done+"%");
 				prev=curr_done;
 			}
-
+			
 			int[] test_data_this_ex=new int[test_data[test_ex_no].length];
 			for(int l=0;l<test_data[test_ex_no].length;l++)
 			{
