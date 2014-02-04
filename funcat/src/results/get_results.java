@@ -6,19 +6,41 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 
 import funcat.pr_store;
+import pr_curve.curve;
 import pr_curve.curve_point;
 
 public class get_results {
 	
+	public static void main(String[] args)
+	{
+		get_results g=new get_results();
+		g.get_file();
+	}
+	
 	public void get_file()
 	{
-		double[][] cssa=read_file("");
-		double[][] aims=read_file("");
-		ArrayList<pr_store> pr_store_list=create_pr_store(cssa.length);
-		for(int i=0;i<cssa.length;i++)
+		double[][] cssa=read_file("E:/curve/church_curve_aims_ms.txt");
+		double[][] aims=read_file("E:/curve/church_curve_aims_selected.txt");
+		curve prc_cssa=new curve();
+		double area1=0,area2=0;
+		for(int i=0;i<50;i++)
 		{
-			curve_point pt=new curve_point(0,0);
+			curve_point pt=new curve_point(cssa[i][0],cssa[i][1]);
+			area1+=cssa[i][0]*cssa[i][1];
+			prc_cssa.add(pt);
 		}
+		curve prc_aims=new curve();
+		for(int i=0;i<50;i++)
+		{
+			curve_point pt=new curve_point(aims[i][0],aims[i][1]);
+			area2+=aims[i][0]*aims[i][1];
+			prc_aims.add(pt);
+		}
+		System.out.println("Area-1: "+area1+"Area-2: "+area2);
+	}
+	
+	public void make_monotonic(curve prc)
+	{
 		
 	}
 	
@@ -47,7 +69,7 @@ public class get_results {
 			while ((line = reader.readLine()) != null) {
 				if(rows==0)
 				{
-					cols=line.split(",").length;
+					cols=line.split("\\s+").length;
 					rows++;
 				}
 			}
@@ -65,7 +87,8 @@ public class get_results {
 			while ((line = br.readLine()) != null)
 			{
 				j=0;
-				for(String tmp : line.split(","))
+				//line=line.replaceAll("\t", ",");
+				for(String tmp : line.split("\\s+"))
 				{
 					temp[i][j]=Double.parseDouble(tmp);
 					j++;
