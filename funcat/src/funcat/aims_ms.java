@@ -248,7 +248,7 @@ public class aims_ms {
 		}
 		for(int k=0;k<pr_store_list.size();k++)
 		{
-			pr_store_list.get(k).tp-=result[0].length;
+			//pr_store_list.get(k).tp-=result[0].length;
 			double tp=pr_store_list.get(k).tp;
 			double fp=pr_store_list.get(k).fp;
 			double fn=pr_store_list.get(k).fn;
