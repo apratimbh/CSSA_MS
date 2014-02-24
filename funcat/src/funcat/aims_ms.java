@@ -156,14 +156,14 @@ public class aims_ms {
 			// ------ AIMS
 
 			int k=0;
-			selected.add("root");
+			/*selected.add("root");
 			selected_arr[vertex_index.get("root")]=1;
 			ms_list.add("root");
 			ms_list_arr[vertex_index.get("root")]=1;
 			questionable.remove("root");
 			questionable_arr[vertex_index.get("root")]=0;
-			k++;
-			double curr_avg=1;
+			k++;*/
+			double curr_avg=0;
 			loop1: while(k<limit)
 			{
 				Split curr_best_split=null;
