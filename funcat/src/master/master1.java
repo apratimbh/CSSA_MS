@@ -54,7 +54,7 @@ import funcat.inde_set_ms;
 import funcat.inde_set_new;
 import funcat.inde_set_selected;
 
-public class master 
+public class master1
 {
 	OWLOntologyManager manager;
 	OWLOntology go;
@@ -79,7 +79,7 @@ public class master
 		try {
 			br = new BufferedReader(new FileReader(inputfile));
 			String line;
-			root=factory.getOWLClass(IRI.create(ontologyIRI + "#root"));
+			//root=factory.getOWLClass(IRI.create(ontologyIRI + "#root"));
 			while((line = br.readLine())!=null)
 			{
 				if(line.contains("hierarchical"))
@@ -89,7 +89,6 @@ public class master
 					String[] part=line.split(",");
 					for(String gene : part)
 					{
-
 						if(gene.contains("/"))
 						{
 							gene=gene.replaceAll("/",	 ".");
@@ -97,19 +96,19 @@ public class master
 							String bottom=gene;
 							g1=factory.getOWLClass(IRI.create(ontologyIRI + "#"+top));
 							g2=factory.getOWLClass(IRI.create(ontologyIRI + "#"+bottom));
+							OWLAxiom axiom = factory.getOWLSubClassOfAxiom(g2, g1);
+							AddAxiom addAxiom = new AddAxiom(ontology, axiom);
+							manager.applyChange(addAxiom);
 						}
-						else
-						{
-							g1=root;
-							g2=factory.getOWLClass(IRI.create(ontologyIRI + "#"+gene));
-						}
-						OWLAxiom axiom = factory.getOWLSubClassOfAxiom(g2, g1);
-						AddAxiom addAxiom = new AddAxiom(ontology, axiom);
-						manager.applyChange(addAxiom);
 					}
 					break;
 				}
 			}
+			g1=factory.getOWLClass(IRI.create(ontologyIRI + "#99"));
+			g2=factory.getOWLClass(IRI.create(ontologyIRI + "#99.1"));
+			OWLAxiom axiom = factory.getOWLSubClassOfAxiom(g2, g1);
+			AddAxiom addAxiom = new AddAxiom(ontology, axiom);
+			manager.applyChange(addAxiom);
 			manager.saveOntology(ontology);
 		} catch (Exception e) {
 			System.out.println("Exception: "+(e.getMessage()));
@@ -524,7 +523,14 @@ public class master
 						//System.out.println("Temp> "+gene.length);
 						int y=predicted_classes.indexOf(temp);
 						//System.out.println(""+temp);
+						try {
 						vec.set(predicted_classes.indexOf(temp),new Double(1));
+						}
+						catch(Exception ee)
+						{
+							System.out.println("Temp>> "+temp);
+							System.exit(0);
+						}
 						//OWLClass t_cls = factory.getOWLClass(IRI.create("http://purl.org/obo/owl/gene_ontology_edit#"+temp));
 						OWLClass t_cls = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+temp));
 						NodeSet<OWLClass> set=reasoner.getSuperClasses(t_cls, false);
@@ -623,7 +629,7 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"cellcycle"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
+		String[] onto_names={"church"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -656,7 +662,11 @@ public class master
 			factory = manager.getOWLDataFactory();
 
 			ArrayList<String> vertex=create_vertex_list();
-
+			if(vertex.contains("root"))
+			{
+				System.out.print("Root!!!");
+				System.exit(0);
+			}
 			File result=new File(result_file);
 			if(!result.exists())
 			{
@@ -769,7 +779,7 @@ public class master
 
 	public static void main(String[] args)
 	{
-		master om=new master();
+		master1 om=new master1();
 		try {
 			om.main();
 		} catch (OWLOntologyCreationException e) {

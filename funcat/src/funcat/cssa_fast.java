@@ -229,7 +229,6 @@ public class cssa_fast {
 					pr_store_list.get(k).fp++;
 				}
 			}
-			pr_store_list.get(k).tp--;
 			for(int l=0;l<test_data[test_ex_no].length;l++)
 			{
 				if(test_data_this_ex[l]==1)
@@ -240,6 +239,7 @@ public class cssa_fast {
 					}
 				}
 			}
+			pr_store_list.get(k).fn--;
 		}
 		catch(Exception e)
 		{
