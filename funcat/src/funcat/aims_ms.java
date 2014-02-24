@@ -263,21 +263,14 @@ public class aims_ms {
 		HashMap<String,String> map=new HashMap<String,String>();
 		for(String s: vertex)
 		{
-			if(s.charAt(0)=='r')
-			{
-				//
-			}
-			else if(s.charAt(0)!='r'&&s.length()<3)
-			{
-				map.put(s, "root");
-			}
-			else if(s.charAt(0)!='r'&&s.length()>3)
+			if(s.length()>3)
 			{
 				String parent=s.substring(0,s.length()-3);
 				//System.out.println(s+" - "+parent);
 				map.put(s, parent);
 			}
 		}
+		map.put("99.1", "99");
 		return map;
 	}
 
