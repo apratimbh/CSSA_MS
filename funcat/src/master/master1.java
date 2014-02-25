@@ -629,7 +629,7 @@ public class master1
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"church"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
+		String[] onto_names={"cellcycle"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
