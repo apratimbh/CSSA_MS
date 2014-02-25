@@ -156,14 +156,14 @@ public class aims_ms {
 			// ------ AIMS
 
 			int k=0;
-			/*selected.add("root");
+			selected.add("root");
 			selected_arr[vertex_index.get("root")]=1;
 			ms_list.add("root");
 			ms_list_arr[vertex_index.get("root")]=1;
 			questionable.remove("root");
 			questionable_arr[vertex_index.get("root")]=0;
-			k++;*/
-			double curr_avg=0;
+			k++;
+			double curr_avg=1;
 			loop1: while(k<limit)
 			{
 				Split curr_best_split=null;
@@ -228,7 +228,7 @@ public class aims_ms {
 					System.out.println();
 					System.out.println("K is - "+k);*/
 					//System.out.println("Q size is - "+questionable.size());
-					update_pr(selected.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
+					update_pr(k,test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 					if(selected.size()==(vertex.size()-1))
 					{
 						continue main_loop;
@@ -248,7 +248,7 @@ public class aims_ms {
 		}
 		for(int k=0;k<pr_store_list.size();k++)
 		{
-			//pr_store_list.get(k).tp-=result[0].length;
+			pr_store_list.get(k).tp-=result[0].length;
 			double tp=pr_store_list.get(k).tp;
 			double fp=pr_store_list.get(k).fp;
 			double fn=pr_store_list.get(k).fn;
@@ -263,14 +263,21 @@ public class aims_ms {
 		HashMap<String,String> map=new HashMap<String,String>();
 		for(String s: vertex)
 		{
-			if(s.length()>3)
+			if(s.charAt(0)=='r')
+			{
+				//
+			}
+			else if(s.charAt(0)!='r'&&s.length()<3)
+			{
+				map.put(s, "root");
+			}
+			else if(s.charAt(0)!='r'&&s.length()>3)
 			{
 				String parent=s.substring(0,s.length()-3);
 				//System.out.println(s+" - "+parent);
 				map.put(s, parent);
 			}
 		}
-		map.put("99.1", "99");
 		return map;
 	}
 
