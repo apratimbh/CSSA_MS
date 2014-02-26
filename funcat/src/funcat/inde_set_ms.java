@@ -354,6 +354,7 @@ public class inde_set_ms {
 					}
 				}
 			}
+			pr_store_list.get(k).fn--;
 		}
 		catch(Exception e)
 		{
