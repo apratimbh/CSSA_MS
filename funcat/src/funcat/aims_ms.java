@@ -343,7 +343,7 @@ public class aims_ms {
 					}
 				}
 			}
-			pr_store_list.get(k).fn--;
+			//pr_store_list.get(k).fn--;
 		}
 		catch(Exception e)
 		{
