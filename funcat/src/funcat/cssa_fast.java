@@ -239,7 +239,6 @@ public class cssa_fast {
 					}
 				}
 			}
-			pr_store_list.get(k).fn--;
 		}
 		catch(Exception e)
 		{
