@@ -623,7 +623,7 @@ public class master
 
 	public void main() throws OWLOntologyCreationException
 	{
-		String[] onto_names={"struc"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
+		String[] onto_names={"hom"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -705,7 +705,7 @@ public class master
 			curve cssa2_curve=cs2.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
 			output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");*/
 
-			cssa_fast cs=new cssa_fast();
+			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
 			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 
@@ -717,7 +717,7 @@ public class master
 			am_curve=ams.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_selected.txt");*/
 
-			/*inde_set_ms isms=new inde_set_ms();
+			inde_set_ms isms=new inde_set_ms();
 			curve inde_curve_ms=isms.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
 			output_curve(inde_curve_ms,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_ms.txt");
 
