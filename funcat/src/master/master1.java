@@ -79,7 +79,7 @@ public class master1
 		try {
 			br = new BufferedReader(new FileReader(inputfile));
 			String line;
-			//root=factory.getOWLClass(IRI.create(ontologyIRI + "#root"));
+			root=factory.getOWLClass(IRI.create(ontologyIRI + "#root"));
 			while((line = br.readLine())!=null)
 			{
 				if(line.contains("hierarchical"))
@@ -89,6 +89,7 @@ public class master1
 					String[] part=line.split(",");
 					for(String gene : part)
 					{
+
 						if(gene.contains("/"))
 						{
 							gene=gene.replaceAll("/",	 ".");
@@ -96,19 +97,19 @@ public class master1
 							String bottom=gene;
 							g1=factory.getOWLClass(IRI.create(ontologyIRI + "#"+top));
 							g2=factory.getOWLClass(IRI.create(ontologyIRI + "#"+bottom));
-							OWLAxiom axiom = factory.getOWLSubClassOfAxiom(g2, g1);
-							AddAxiom addAxiom = new AddAxiom(ontology, axiom);
-							manager.applyChange(addAxiom);
 						}
+						else
+						{
+							g1=root;
+							g2=factory.getOWLClass(IRI.create(ontologyIRI + "#"+gene));
+						}
+						OWLAxiom axiom = factory.getOWLSubClassOfAxiom(g2, g1);
+						AddAxiom addAxiom = new AddAxiom(ontology, axiom);
+						manager.applyChange(addAxiom);
 					}
 					break;
 				}
 			}
-			g1=factory.getOWLClass(IRI.create(ontologyIRI + "#99"));
-			g2=factory.getOWLClass(IRI.create(ontologyIRI + "#99.1"));
-			OWLAxiom axiom = factory.getOWLSubClassOfAxiom(g2, g1);
-			AddAxiom addAxiom = new AddAxiom(ontology, axiom);
-			manager.applyChange(addAxiom);
 			manager.saveOntology(ontology);
 		} catch (Exception e) {
 			System.out.println("Exception: "+(e.getMessage()));
@@ -523,14 +524,7 @@ public class master1
 						//System.out.println("Temp> "+gene.length);
 						int y=predicted_classes.indexOf(temp);
 						//System.out.println(""+temp);
-						try {
 						vec.set(predicted_classes.indexOf(temp),new Double(1));
-						}
-						catch(Exception ee)
-						{
-							System.out.println("Temp>> "+temp);
-							System.exit(0);
-						}
 						//OWLClass t_cls = factory.getOWLClass(IRI.create("http://purl.org/obo/owl/gene_ontology_edit#"+temp));
 						OWLClass t_cls = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+temp));
 						NodeSet<OWLClass> set=reasoner.getSuperClasses(t_cls, false);
@@ -662,31 +656,29 @@ public class master1
 			factory = manager.getOWLDataFactory();
 
 			ArrayList<String> vertex=create_vertex_list();
-			if(vertex.contains("root"))
-			{
-				System.out.print("Root!!!");
-				System.exit(0);
-			}
+
 			File result=new File(result_file);
-			if(!result.exists())
+			result.delete();
+
+			System.out.println("Creating kernel file");
+			create_fv_arr(fv_arr_file,vertex);
+			System.out.println("Creating training file");
+			convert_arff_file_expand(vertex,train_file,converted_train_file,onto_names[i]);
+			System.out.println("Creating validation file");
+			convert_arff_file_expand(vertex,valid_file,converted_vaild_file,onto_names[i]);
+			System.out.println("Creating test file");
+			convert_arff_file(vertex,test_file,converted_test_file,onto_names[i]);
+			System.out.println("Creating merged file");
+			merge_files(converted_train_file,converted_vaild_file,combined_train_file);
+			System.out.println("Creating expanded file");
+			convert_arff_file_expand(vertex,test_file,expanded_test_file,onto_names[i]);
+
+			//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
+			//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
+			for(int cc=1;cc<5;cc++)
 			{
-				System.out.println("Creating kernel file");
-				create_fv_arr(fv_arr_file,vertex);
-				System.out.println("Creating training file");
-				convert_arff_file_expand(vertex,train_file,converted_train_file,onto_names[i]);
-				System.out.println("Creating validation file");
-				convert_arff_file_expand(vertex,valid_file,converted_vaild_file,onto_names[i]);
-				System.out.println("Creating test file");
-				convert_arff_file(vertex,test_file,converted_test_file,onto_names[i]);
-				System.out.println("Creating merged file");
-				merge_files(converted_train_file,converted_vaild_file,combined_train_file);
-				System.out.println("Creating expanded file");
-				convert_arff_file_expand(vertex,test_file,expanded_test_file,onto_names[i]);
 
-				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
-				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
-
-				String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
+				String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';c="+(0.0002 -0.00005*cc)+";KPCA_final\"" };
 				Process p;
 				try {
 					p = Runtime.getRuntime().exec(cmd);
@@ -704,22 +696,23 @@ public class master1
 						e.printStackTrace();
 					}
 				}
-			}
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 
-			/*cssa2 cs2=new cssa2();
-			curve cssa2_curve=cs2.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
-			output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");*/
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 
-			cssa_fast cs=new cssa_fast();
+				cssa2 cs2=new cssa2();
+				curve cssa2_curve=cs2.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
+				output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2"+cc+".txt");
+				result1.delete();
+
+				/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
 			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");
 
-			/*aims_ms am=new aims_ms();
+			aims_ms am=new aims_ms();
 			curve am_curve=am.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_ms.txt");
 
@@ -727,7 +720,7 @@ public class master1
 			am_curve=ams.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_selected.txt");*/
 
-			/*inde_set_ms isms=new inde_set_ms();
+				/*inde_set_ms isms=new inde_set_ms();
 			curve inde_curve_ms=isms.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
 			output_curve(inde_curve_ms,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_ms.txt");
 
@@ -735,7 +728,7 @@ public class master1
 			curve inde_curve_sl=issl.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
 			output_curve(inde_curve_sl,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_selected.txt");*/
 
-			/*File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
+				/*File file4=new File(matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
 			if(!file4.exists())
 			{
 				cssa2 cs=new cssa2();
@@ -769,7 +762,7 @@ public class master1
 				curve inde_curve=isn.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,70);
 				output_curve(inde_curve,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_new.txt");
 			}*/
-
+			}
 
 		}
 

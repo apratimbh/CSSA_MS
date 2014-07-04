@@ -200,7 +200,7 @@ public class cssa2 {
 						System.out.println(s);
 					}
 					System.exit(0);*/
-					update_pr(ms_nodes.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
+					update_pr(selected.size(),test_ex_no,pr_store_list,selected,vertex,test_data_this_ex);
 				}
 				else
 				{

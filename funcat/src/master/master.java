@@ -61,7 +61,7 @@ public class master
 	OWLReasoner reasoner;
 	OWLDataFactory factory;
 
-	public void create_new_ontology(String inputfile,String ontology_name,String ontology_file_name) throws OWLOntologyCreationException
+	public void create_new_ontology(String inputfile,String ontology_name,String ontology_file_name) throws OWLOntologyCreationException, IOException
 	{
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		BufferedReader br=null;
@@ -76,6 +76,8 @@ public class master
 		OWLReasonerConfiguration config = new SimpleConfiguration(progressMonitor);
 		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology, config);
 		OWLClass g1,g2,root;
+
+
 		try {
 			br = new BufferedReader(new FileReader(inputfile));
 			String line;
@@ -117,6 +119,33 @@ public class master
 		}
 	}
 
+	public void create_ontology_vector(ArrayList<String> vertex,String ontology_name) throws IOException
+	{
+		BufferedWriter bw=new BufferedWriter(new FileWriter("E:\\CSSA\\"+ontology_name+".tree"));
+		for(String s:vertex)
+		{
+			if(s.equals("root"))
+			{
+				bw.write("-1\n");
+				System.out.println("Here: root> "+s);
+			}
+			else if(s!="root"&&s.contains("."))
+			{
+				bw.write((vertex.indexOf(get_parent(s))+1)+"\n");
+			}
+			else if(s!="root"&&!s.contains("."))
+			{
+				bw.write((vertex.indexOf("root")+1)+"\n");
+			}
+			else
+			{
+				bw.write("-1\n");
+				System.out.println("Here: root> "+s);
+			}
+		}
+		bw.close();
+	}
+
 	public int get_number_of_attr(String filename)
 	{
 		BufferedReader br = null;
@@ -145,19 +174,29 @@ public class master
 		return (c-1);
 	}
 
-	public static String get_parent(String s)
+	public String get_parent(String s)
 	{
-		return s.substring(0,s.lastIndexOf('.'));
+		if(s!="root"&&s.contains("."))
+			return s.substring(0,s.lastIndexOf('.'));
+		else
+			return "root";
 	}
 
 	public ArrayList<String> create_vertex_list()
 	{
+		go.getClassesInSignature();
 		ArrayList<String> vertex=new ArrayList<String>();
-		Set<OWLClass> ce=reasoner.getTopClassNode().getEntities();
+		Set<OWLClass> ce=go.getClassesInSignature();
+		System.out.println("Printing nodes: ");
 		for(OWLClass c : ce)
 		{
+			//System.out.println(c.toString());
+			String part=c.toString();
+			part=part.replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
+			vertex.add(part);
+			//System.out.println(part);
 			//System.out.println(c.asOWLClass().getIRI().toString());
-			OWLClassExpression cx=c.asOWLClass();
+			/*OWLClassExpression cx=c.asOWLClass();
 			NodeSet<OWLClass> set=reasoner.getSubClasses(cx, false);
 			for (Node<OWLClass> ind : set)
 			{
@@ -168,9 +207,17 @@ public class master
 					String[] part=news.split(" ");
 					part[1]=part[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
 					vertex.add(part[1]);
+					System.out.println(part[1]);
 				}
-			}
+			}*/
 		}
+		vertex.remove(vertex.indexOf("root"));
+		vertex.add(0,"root");
+		for(String s:vertex)
+		{
+			//System.out.println(s);
+		}
+		//System.exit(0);
 		return vertex;
 	}
 
@@ -621,9 +668,9 @@ public class master
 		}
 	}
 
-	public void main() throws OWLOntologyCreationException
+	public void main() throws OWLOntologyCreationException, IOException
 	{
-		String[] onto_names={"hom"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
+		String[] onto_names={"cellcycle"/*"pheno","gasch1","gasch2","eisen","expr","derisi","spo","seq","cellcycle","church"*/};
 		String matlab_folder="E:/test/";
 		for(int i=0;i<onto_names.length;i++)
 		{
@@ -657,6 +704,8 @@ public class master
 
 			ArrayList<String> vertex=create_vertex_list();
 
+			create_ontology_vector(vertex,onto_names[i]);
+			
 			File result=new File(result_file);
 			if(!result.exists())
 			{
@@ -676,6 +725,8 @@ public class master
 				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');file1="+fv_arr_file+";\"" };
 				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"')\"" };
 
+				//String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
+
 				String[] cmd = { "matlab", "/r", "\"cd('"+matlab_folder+"');cnum="+no_attr+";file1='"+fv_arr_file+"';file2='"+combined_train_file+"';file3='"+converted_test_file+"';file4='"+result_file+"';KPCA_final\"" };
 				Process p;
 				try {
@@ -684,6 +735,7 @@ public class master
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+
 
 				File result1=new File(result_file);
 				while(!result1.exists())
@@ -701,9 +753,11 @@ public class master
 				e.printStackTrace();
 			}
 
-			/*cssa2 cs2=new cssa2();
+			System.exit(0);
+			
+			cssa2 cs2=new cssa2();
 			curve cssa2_curve=cs2.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
-			output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");*/
+			output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
 
 			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
@@ -717,9 +771,9 @@ public class master
 			am_curve=ams.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
 			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_selected.txt");*/
 
-			inde_set_ms isms=new inde_set_ms();
+			/*inde_set_ms isms=new inde_set_ms();
 			curve inde_curve_ms=isms.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
-			output_curve(inde_curve_ms,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_ms.txt");
+			output_curve(inde_curve_ms,matlab_folder1+"/"+onto_names[i]+"_curve_inde_fast_ms.txt");*/
 
 			/*inde_set_selected issl=new inde_set_selected();
 			curve inde_curve_sl=issl.main(result_file, expanded_test_file, ontology_file_name, vertex, no_attr,100);
@@ -772,7 +826,7 @@ public class master
 		master om=new master();
 		try {
 			om.main();
-		} catch (OWLOntologyCreationException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
