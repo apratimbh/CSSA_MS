@@ -66,7 +66,7 @@ public class cssa2 {
 
 		ArrayList<pr_store> pr_store_list=create_pr_store(limit+10);
 		int prev=0;
-		
+
 		HashMap<String,String> node_parent=create_parent_map(vertex);
 
 		vertex_index=new HashMap<String,Integer>();
@@ -79,18 +79,22 @@ public class cssa2 {
 		{
 			OWLClass t_cls = factory.getOWLClass(IRI.create(go.getOntologyID().getOntologyIRI().toString()+"#"+vertex.get(i)));
 			NodeSet<OWLClass> set=reasoner.getSubClasses(t_cls, false);
-			//System.out.println("\nLabel: "+temp+"\tSuperClasses:");
+			//System.out.println("Class: "+t_cls.toString().replaceAll("^<", "").replaceAll(">$", "").split("#")[1]);
 			for(Node<OWLClass> cls : set)
 			{
 				if(!cls.isBottomNode())
 				{
+					//System.out.println("\nClass: "+cls.toString().split(" ")[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1]);
 					String news=cls+"";
 					news=news.split(" ")[1].replaceAll("^<", "").replaceAll(">$", "").split("#")[1];
 					int j=vertex_index.get(news);
+					//System.out.print(" Num: "+vertex_index.get(news));
 					sub_class_arr[i][j]=1;
 				}
 			}
+			//System.exit(0);
 		}
+
 		main_loop: for(int test_ex_no=1;test_ex_no<result[0].length;test_ex_no++)
 		{
 			int curr_done=(int)(((double)test_ex_no/result[0].length)*100);
@@ -105,6 +109,7 @@ public class cssa2 {
 			{
 				test_data_this_ex[l]=(int) test_data[test_ex_no][l];
 			}
+			//System.out.println("Col: "+columns+"Root val: "+test_data_this_ex[0]);
 			// load the weights of each label
 			double[] weights=new double[result.length];
 			for(int i=0;i<result.length;i++)
@@ -139,7 +144,7 @@ public class cssa2 {
 			HashMap<Supernode,Double> allocated_density=new HashMap<Supernode,Double>();
 			// selected nodes
 			ArrayList<String> selected=new ArrayList<String>();
-			
+
 			ArrayList<String> ms_nodes=new ArrayList<String>();
 
 			// -------------
@@ -148,7 +153,7 @@ public class cssa2 {
 			//System.out.println("Supernode size: "+sn_list.size());
 			int k=0;
 			// k1 keeps track of the number of ms labels (nodes) selected so far
-			while(k<limit&&sn_list.size()>0)
+			while(k<limit&&sn_list.size()>0&&selected.size()<(vertex.size()-1))
 			{	
 				// ----- select supernode with max snv
 				Supernode selected_sn=sn_list.get(0);
@@ -192,7 +197,7 @@ public class cssa2 {
 					{
 						System.out.println(s);
 					}*/
-					
+
 					update_ms(ms_nodes,new_ms);
 					/*System.out.println("update ms");
 					for(String s: ms_nodes)
@@ -210,22 +215,29 @@ public class cssa2 {
 					sn_list.remove(selected_sn);
 					sn_list.add(merged);
 				}
-				
+
 			} // --for loop end // all examples
 			//System.exit(0);
 		}
-		for(int k=0;k<pr_store_list.size();k++)
+		curve_point pt=new curve_point(1,0);
+		prc.add(pt);
+		for(int k=2;k<pr_store_list.size();k++)
 		{
-			pr_store_list.get(k).tp-=result[0].length;
+			//pr_store_list.get(k).tp-=result[0].length;
 			double tp=pr_store_list.get(k).tp;
 			double fp=pr_store_list.get(k).fp;
 			double fn=pr_store_list.get(k).fn;
-			curve_point pt=new curve_point(tp/(tp+fp),tp/(tp+fn));
-			prc.add(pt);
+			if(!Double.isNaN(tp/(tp+fp))&&!Double.isNaN(tp/(tp+fn)))
+			{
+				pt=new curve_point(tp/(tp+fp),tp/(tp+fn));
+				prc.add(pt);
+			}
 		}
+		pt=new curve_point(0,1);
+		prc.add(pt);
 		return prc;
 	}
-	
+
 	public void update_ms(ArrayList<String> ms_list,ArrayList<String> new_ms)
 	{
 		for(String s: new_ms)
@@ -252,11 +264,11 @@ public class cssa2 {
 		}
 		for(String s:to_add)
 		{
-			 ms_list.add(s);
+			ms_list.add(s);
 		}
 		for(String s:to_remove)
 		{
-			 ms_list.remove(s);
+			ms_list.remove(s);
 		}
 	}
 
@@ -283,7 +295,7 @@ public class cssa2 {
 		}
 		return new_ms_list;
 	}
-	
+
 	public HashMap<String,String> create_parent_map(ArrayList<String> vertex)
 	{
 		HashMap<String,String> map=new HashMap<String,String>();
@@ -306,7 +318,7 @@ public class cssa2 {
 		}
 		return map;
 	}
-	
+
 	public ArrayList<pr_store> create_pr_store(int num)
 	{
 		ArrayList<pr_store> pr_store_list=new ArrayList<pr_store>();
@@ -350,16 +362,19 @@ public class cssa2 {
 		try {
 			for(String s : selected)
 			{
-				if(test_data_this_ex[vertex.indexOf(s)]==1)
+				if(!s.equals("root"))
 				{
-					pr_store_list.get(k).tp++;
-				}
-				else
-				{
-					pr_store_list.get(k).fp++;
+					if(test_data_this_ex[vertex.indexOf(s)]==1)
+					{
+						pr_store_list.get(k).tp++;
+					}
+					else
+					{
+						pr_store_list.get(k).fp++;
+					}
 				}
 			}
-			for(int l=0;l<test_data[test_ex_no].length;l++)
+			for(int l=1;l<test_data[test_ex_no].length;l++)
 			{
 				if(test_data_this_ex[l]==1)
 				{
@@ -717,7 +732,7 @@ public class cssa2 {
 	{
 		double[][] temp=read_file(file);
 		double[][] temp1=new double[temp.length][temp[0].length- no_of_columns_to_exclude];
-		for(int j= no_of_columns_to_exclude+1;j<temp[0].length;j++)
+		for(int j= no_of_columns_to_exclude;j<temp[0].length;j++)
 		{
 			for(int i=0;i<temp.length;i++)
 			{

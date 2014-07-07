@@ -704,7 +704,7 @@ public class master
 
 			ArrayList<String> vertex=create_vertex_list();
 
-			create_ontology_vector(vertex,onto_names[i]);
+			//create_ontology_vector(vertex,onto_names[i]);
 			
 			File result=new File(result_file);
 			if(!result.exists())
@@ -753,12 +753,16 @@ public class master
 				e.printStackTrace();
 			}
 
-			System.exit(0);
+			//System.exit(0);
 			
 			cssa2 cs2=new cssa2();
-			curve cssa2_curve=cs2.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
-			output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa2.txt");
-
+			curve cssa2_curve=cs2.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,200);
+			output_curve(cssa2_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa_nxt.txt");
+			
+			aims_selected ams=new aims_selected();
+			curve am_curve=ams.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr, 100);
+			output_curve(am_curve,matlab_folder1+"/"+onto_names[i]+"_curve_aims_selected_nxt.txt");
+			
 			/*cssa_fast cs=new cssa_fast();
 			curve cssa_curve=cs.main(result_file, expanded_test_file, ontology_file_name, vertex,no_attr,100);
 			output_curve(cssa_curve,matlab_folder1+"/"+onto_names[i]+"_curve_cssa.txt");

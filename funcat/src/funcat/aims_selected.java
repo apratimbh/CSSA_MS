@@ -246,15 +246,22 @@ public class aims_selected {
 
 			// --for loop end // all examples
 		}
-		for(int k=0;k<pr_store_list.size();k++)
+		curve_point pt=new curve_point(1,0);
+		prc.add(pt);
+		for(int k=2;k<pr_store_list.size();k++)
 		{
-			pr_store_list.get(k).tp-=result[0].length;
+			//pr_store_list.get(k).tp-=result[0].length;
 			double tp=pr_store_list.get(k).tp;
 			double fp=pr_store_list.get(k).fp;
 			double fn=pr_store_list.get(k).fn;
-			curve_point pt=new curve_point(tp/(tp+fp),tp/(tp+fn));
-			prc.add(pt);
+			if(!Double.isNaN(tp/(tp+fp))&&!Double.isNaN(tp/(tp+fn)))
+			{
+				pt=new curve_point(tp/(tp+fp),tp/(tp+fn));
+				prc.add(pt);
+			}
 		}
+		pt=new curve_point(0,1);
+		prc.add(pt);
 		return prc;
 	}
 
@@ -324,16 +331,19 @@ public class aims_selected {
 		try {
 			for(String s : selected)
 			{
-				if(test_data_this_ex[vertex.indexOf(s)]==1)
+				if(!s.equals("root"))
 				{
-					pr_store_list.get(k).tp++;
-				}
-				else
-				{
-					pr_store_list.get(k).fp++;
+					if(test_data_this_ex[vertex.indexOf(s)]==1)
+					{
+						pr_store_list.get(k).tp++;
+					}
+					else
+					{
+						pr_store_list.get(k).fp++;
+					}
 				}
 			}
-			for(int l=0;l<test_data[test_ex_no].length;l++)
+			for(int l=1;l<test_data[test_ex_no].length;l++)
 			{
 				if(test_data_this_ex[l]==1)
 				{
@@ -467,7 +477,7 @@ public class aims_selected {
 	{
 		double[][] temp=read_file(file);
 		double[][] temp1=new double[temp.length][temp[0].length- no_of_columns_to_exclude];
-		for(int j= no_of_columns_to_exclude+1;j<temp[0].length;j++)
+		for(int j= no_of_columns_to_exclude;j<temp[0].length;j++)
 		{
 			for(int i=0;i<temp.length;i++)
 			{
